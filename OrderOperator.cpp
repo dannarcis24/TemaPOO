@@ -58,3 +58,7 @@ ostream& operator<<(ostream& out, const OrderOperator elem)
     elem.write(out);
     return out;
 }
+
+const int OrderOperator::ordersNumber() const {
+    return orders.size();
+}

@@ -21,6 +21,6 @@ public:
 
     friend istream& operator>>(istream&, Order&);
 
-    const int getTime();
+    const int getTime(bool = true);
     const int getPrice() const;
 };

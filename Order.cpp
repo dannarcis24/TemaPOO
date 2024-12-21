@@ -27,7 +27,7 @@ void Order::validation(vector<Product> &vec)
     if(price < 100)
         throw DynamicException("comanda_invalida", "!! o comanda trebuie sa aiba pretul minim de 100lei, fara costuri suplimentare !!\n\n");   
 
-    ID = "$" + to_string(Order::numar);     
+    ID = "$" + to_string(Order::numar++);     
 }
 
 Order::Order(vector<Product> vec, const Date date, int t): processing_date(date), time(t) {
@@ -59,8 +59,8 @@ istream& operator>>(istream& in, Order& elem)
     return in;
 }
 
-const int Order::getTime() {
-    return (--time);
+const int Order::getTime(bool type) {
+    return (type ? --time : time);
 }
 
 const int Order::getPrice() const

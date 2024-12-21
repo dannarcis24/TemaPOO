@@ -17,4 +17,5 @@ public:
     
     void orderAdd(Order&);
     void orderFinish();
+    const int ordersNumber() const;
 };
