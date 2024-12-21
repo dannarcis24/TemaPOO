@@ -15,9 +15,9 @@ protected:
 
 public:
     Employee() = default;
-    Employee(const string, const string, const string, const Date, bool);
-    Employee(const string, const string, const string, int, int, int, bool);
-    Employee(const string, const string, const string, const string, bool);
+    Employee(const string&, const string&, const string&, const Date&, bool);
+    Employee(const string&, const string&, const string&, int, int, int, bool);
+    Employee(const string&, const string&, const string&, const string&, bool);
 
     friend ostream& operator<<(ostream&, const Employee*);
     friend ostream& operator<<(ostream&, const Employee); 
@@ -25,7 +25,9 @@ public:
     // de implementat citirea
 
     virtual const int salary() const;
-    inline void setName(const string);
+    inline void setName(const string&);
+    const string position() const;
+    bool exist(const string&) const;
 
 private:
     const Date birthday() const;

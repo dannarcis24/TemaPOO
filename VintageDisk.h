@@ -9,9 +9,9 @@ class VintageDisk: public Disk {
 
 public:
     VintageDisk() = default;
-    VintageDisk(const string, int, double, const string, const string, const string, const Date, bool, int, bool);
-    VintageDisk(const string, int, double, const string, const string, const string, const string, bool, int, bool);
-    VintageDisk(const string, int, double, const string, const string, const string, int, int, int, bool, int, bool);
+    VintageDisk(const string&, int, int, const string&, const string&, const string&, const Date&, bool, int, bool);
+    VintageDisk(const string&, int, int, const string&, const string&, const string&, const string&, bool, int, bool);
+    VintageDisk(const string&, int, int, const string&, const string&, const string&, int, int, int, bool, int, bool);
     VintageDisk(const Disk, int, bool);
 
     friend ostream& operator<<(ostream&, const VintageDisk&);

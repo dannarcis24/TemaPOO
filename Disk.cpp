@@ -10,15 +10,15 @@ void Disk::validation() const
         throw DynamicException("album_invalid", "!! numele albumului nu poate sa fie un sir gol !!\n\n");
 }
 
-Disk::Disk(const string name, int number1, double price, const string disk, const string band1, const string album, const Date data, bool t): Product(name, number1, price), record_company(disk), band(band1), album_name(album), sale_date(data), type(t) {
+Disk::Disk(const string& name, int number1, int price, const string& disk, const string& band1, const string& album, const Date& data, bool t): Product(name, number1, price), record_company(disk), band(band1), album_name(album), sale_date(data), type(t) {
     validation();
 }
 
-Disk::Disk(const string name, int number1, double price, const string disk, const string band1, const string album, const string data, bool t): Product(name, number1, price), record_company(disk), band(band1), album_name(album), sale_date(data), type(t) {
+Disk::Disk(const string& name, int number1, int price, const string& disk, const string& band1, const string& album, const string& data, bool t): Product(name, number1, price), record_company(disk), band(band1), album_name(album), sale_date(data), type(t) {
     validation();
 }
 
-Disk::Disk(const string name, int number1, double price, const string disk, const string band1, const string album, int day, int month, int year, bool t): Product(name, number1, price), record_company(disk), band(band1), album_name(album), sale_date(day, month, year), type(t) {
+Disk::Disk(const string& name, int number1, int price, const string& disk, const string& band1, const string& album, int day, int month, int year, bool t): Product(name, number1, price), record_company(disk), band(band1), album_name(album), sale_date(day, month, year), type(t) {
     validation();
 }
 

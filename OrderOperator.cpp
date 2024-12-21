@@ -2,7 +2,7 @@
 
 int Employee::coefficient = 1;
 
-OrderOperator::OrderOperator(vector<Order> vec)
+OrderOperator::OrderOperator(vector<Order>& vec)
 {
     if(vec.size() > 3)
         throw DynamicException("cerere_invalida", "!! un operator de comenzi nu poate gestiona mai mult de 3comenzi in paralel !!\n\n");

@@ -9,7 +9,7 @@ class Date{
 public:
     Date() = default;
     Date(int, int, int);
-    Date(const string);
+    Date(const string&);
 
     friend ostream& operator<<(ostream&, const Date&);
     friend istream& operator>>(istream&, Date&);

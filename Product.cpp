@@ -3,7 +3,7 @@
 
 long long Product::number = 0;
 
-Product::Product(const string nume, int number1, double price): name(nume), number_products(number1), price_base(price) { 
+Product::Product(const string& name1, int number1, int price): name(name1), number_products(number1), price_base(price) { 
     if(name.empty())
         throw DynamicException("denumire_invalida", "!! denumirea unui product nu poate fi un sir gol !!\n\n");
     if(number_products < 0)
@@ -12,7 +12,10 @@ Product::Product(const string nume, int number1, double price): name(nume), numb
         throw DynamicException("numar_producte_invalid", "!! numarul de producte nu poate fi un numar negativ !!");
     }
     if(price_base <= 0)
+    {
+        price_base = 0;
         throw DynamicException("pret_invalid", "!! pretul unui product trebuie sa fie un numar pozitiv !!\n\n");
+    }
 
     ID =  "#" + to_string(Product::number++);
 }
@@ -60,8 +63,8 @@ istream& operator>>(istream& in, Product* elem)
     return in;
 }
 
-void Product::setNumberProducts(int numar) {
-    if(numar < 0)
+void Product::setNumberProducts(const int& nr) {
+    if(nr < 0)
         throw DynamicException("numar_producte_invalid", "!! numarul de producte nu poate fi un numar negativ !!");
-    number_products = numar;
+    number_products = nr;
 }

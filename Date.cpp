@@ -54,7 +54,7 @@ Date::Date(int zz, int ll, int aaaa): day(zz), month(ll), year(aaaa) {
     validationDate();
 }
 
-Date::Date(const string data) {
+Date::Date(const string& data) {
     validationDate(data);
 }
 

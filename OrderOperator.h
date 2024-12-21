@@ -8,7 +8,7 @@ class OrderOperator: public Employee {
 
 public:
     OrderOperator() = default;
-    OrderOperator(vector<Order>);
+    OrderOperator(vector<Order>&);
 
     friend ostream& operator<<(ostream&, const OrderOperator*);
     friend ostream& operator<<(ostream&, const OrderOperator);

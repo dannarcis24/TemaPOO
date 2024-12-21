@@ -11,9 +11,9 @@ protected:
 
 public:
     Disk() = default;
-    Disk(const string, int, double, const string, const string, const string, const Date, bool);
-    Disk(const string, int, double, const string, const string, const string, const string, bool);
-    Disk(const string, int, double, const string, const string, const string, int, int, int, bool);
+    Disk(const string&, int, int, const string&, const string&, const string&, const Date&, bool);
+    Disk(const string&, int, int, const string&, const string&, const string&, const string&, bool);
+    Disk(const string&, int, int, const string&, const string&, const string&, int, int, int, bool);
 
     friend ostream& operator<<(ostream&, const Disk&);
     friend istream& operator>>(istream&, Disk&);

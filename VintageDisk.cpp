@@ -1,16 +1,16 @@
 #include "VintageDisk.h"
 
-VintageDisk::VintageDisk(const string name, int number, double price, const string disk, const string band, const string album, const Date data, bool t,int coef, bool type): Disk(name, number, price, disk, band, album, data, t), rarity(coef), mint(type) {
+VintageDisk::VintageDisk(const string& name, int number, int price, const string& disk, const string& band, const string& album, const Date& data, bool t,int coef, bool type): Disk(name, number, price, disk, band, album, data, t), rarity(coef), mint(type) {
     if(rarity < 1 || rarity > 5)
         throw DynamicException("coeficient_raritate_invalid", "!! coeficientul de raritate al unui disc vintage este cuprins intre 1-5 !!\n\n");
 }
 
-VintageDisk::VintageDisk(const string name, int number, double price, const string disk, const string band, const string album, const string data, bool t, int coef, bool type): Disk(name, number, price, disk, band, album, data, t), rarity(coef), mint(type) {
+VintageDisk::VintageDisk(const string& name, int number, int price, const string& disk, const string& band, const string& album, const string& data, bool t, int coef, bool type): Disk(name, number, price, disk, band, album, data, t), rarity(coef), mint(type) {
     if(rarity < 1 || rarity > 5)
         throw DynamicException("coeficient_raritate_invalid", "!! coeficientul de raritate al unui disc vintage este cuprins intre 1-5 !!\n\n");
 }
 
-VintageDisk::VintageDisk(const string name, int number, double price, const string disk, const string band, const string album, int day, int month, int year, bool t, int coef, bool type):Disk(name, number, price, disk, band, album, day, month, year, t), rarity(coef), mint(type) {
+VintageDisk::VintageDisk(const string& name, int number, int price, const string& disk, const string& band, const string& album, int day, int month, int year, bool t, int coef, bool type):Disk(name, number, price, disk, band, album, day, month, year, t), rarity(coef), mint(type) {
     if(rarity < 1 || rarity > 5)
         throw DynamicException("coeficient_raritate_invalid", "!! coeficientul de raritate al unui disc vintage este cuprins intre 1-5 !!\n\n");
 }

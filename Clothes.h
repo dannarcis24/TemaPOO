@@ -5,7 +5,7 @@ class Clothes: public Product{
 
 public:
     Clothes() = default;
-    Clothes(const string, int, double, const string, const string);
+    Clothes(const string&, int, int, const string&, const string&);
 
     friend ostream& operator<<(ostream&, const Clothes&);
     friend istream& operator>>(istream&, Clothes&);

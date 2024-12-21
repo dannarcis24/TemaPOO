@@ -2,7 +2,7 @@
 
 long long Order::numar = 0;
 
-void Order::validation(vector<Product> &vec) 
+void Order::validation(vector<Product>& vec) 
 {
     if(vec.empty())
         throw DynamicException("comanda_invalida", "!! o comanda trebuie sa aiba cel putin un Product !!\n\n");
@@ -30,15 +30,15 @@ void Order::validation(vector<Product> &vec)
     ID = "$" + to_string(Order::numar++);     
 }
 
-Order::Order(vector<Product> vec, const Date date, int t): processing_date(date), time(t) {
+Order::Order(vector<Product>& vec, const Date& date, int t): processing_date(date), time(t) {
     validation(vec);
 }
 
-Order::Order(vector<Product> vec, const string date, int t): processing_date(date), time(t) {
+Order::Order(vector<Product>& vec, const string& date, int t): processing_date(date), time(t) {
     validation(vec);
 }
 
-Order::Order(vector<Product> vec, int day, int month, int year, int t): processing_date(day, month, year), time(t) {
+Order::Order(vector<Product>& vec, int day, int month, int year, int t): processing_date(day, month, year), time(t) {
     validation(vec);
 }
 

@@ -103,15 +103,15 @@ void Employee::validation()
     coefficient = (job ? 0.75 : 1.25);
 }
 
-Employee::Employee(const string name1, const string name2, const string cod, const Date date, bool type): last_name(name1), first_name(name2), CNP(cod), employment_date(date), job(type) {
+Employee::Employee(const string& name1, const string& name2, const string& cod, const Date& date, bool type): last_name(name1), first_name(name2), CNP(cod), employment_date(date), job(type) {
     validation();
 }
 
-Employee::Employee(const string name1, const string name2, const string cod, int day, int month, int year, bool type): last_name(name1), first_name(name2), CNP(cod), employment_date(day, month, year), job(type) {
+Employee::Employee(const string& name1, const string& name2, const string& cod, int day, int month, int year, bool type): last_name(name1), first_name(name2), CNP(cod), employment_date(day, month, year), job(type) {
     validation();
 }
 
-Employee::Employee(const string name1, const string name2, const string cod, const string date, bool type): last_name(name1), first_name(name2), CNP(cod), employment_date(date), job(type) {
+Employee::Employee(const string& name1, const string& name2, const string& cod, const string& date, bool type): last_name(name1), first_name(name2), CNP(cod), employment_date(date), job(type) {
     validation();
 }
 
@@ -119,7 +119,7 @@ const int Employee::salary() const {
     return ((salary_base + old * employment_date.years()) * coefficient + (job && birthday().isBirthday() ? 100 : 0));
 }
 
-void Employee::setName(const string sir)
+void Employee::setName(const string& sir)
 {
     validationString(sir);
     last_name = sir;
@@ -144,4 +144,12 @@ ostream& operator<<(ostream& out, const Employee elem)
 {
     elem.write(out);
     return out;
+}
+
+const string Employee::position() const {
+    return (coefficient == 0.75 ? "asistent" : (coefficient == 1 ? "operator comenzi" : "manager"));
+}
+
+bool Employee::exist(const string& id) const {
+    return (ID == id);
 }

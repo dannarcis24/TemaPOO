@@ -13,9 +13,9 @@ class Order {
 
 public:
     Order() = default;
-    Order(vector<Product>, const Date, int);
-    Order(vector<Product>, const string, int);
-    Order(vector<Product>, int, int, int, int);
+    Order(vector<Product>&, const Date&, int);
+    Order(vector<Product>&, const string&, int);
+    Order(vector<Product>&, int, int, int, int);
 
     ~Order() = default; // de gandit daca merita
 

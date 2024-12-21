@@ -1,6 +1,6 @@
 #include "Clothes.h"
 
-Clothes::Clothes(const string name, int number1, double price, const string culoare, const string marca): Product(name, number1, price), color(culoare), brand(marca) 
+Clothes::Clothes(const string& name, int number1, int price, const string& culoare, const string& marca): Product(name, number1, price), color(culoare), brand(marca) 
 {
     if(color.empty())
         throw DynamicException("culoare_invalida", "!! culoarea nu poate sa fie un sir gol !!\n\n");

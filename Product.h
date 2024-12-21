@@ -3,8 +3,7 @@
 class Product {
 protected:
     string name, ID = "#0";
-    unsigned int number_products = 0;
-    double price_base = 0;
+    unsigned int number_products = 0, price_base = 0;
 
     static long long number;
 
@@ -13,12 +12,12 @@ protected:
 
 public:
     Product() = default;
-    Product(const string, int, double);
+    Product(const string&, int, int);
     virtual ~Product() = default;
 
     friend ostream& operator<<(ostream&, const Product*);
     friend istream& operator>>(istream&, Product*);
 
     virtual const double getPrice(bool = true) const = 0;
-    void setNumberProducts(int);
+    void setNumberProducts(const int&);
 };
