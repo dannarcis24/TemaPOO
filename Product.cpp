@@ -68,3 +68,7 @@ void Product::setNumberProducts(const int& nr) {
         throw DynamicException("numar_producte_invalid", "!! numarul de producte nu poate fi un numar negativ !!");
     number_products = nr;
 }
+
+bool Product::exist(const string& ID) const {
+    return (this->ID == ID);
+}

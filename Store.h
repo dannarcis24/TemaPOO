@@ -46,7 +46,8 @@ public:
      /* OPERATII CU ANGAJATI */
     //////////////////////////
     inline void employeeAdd(Employee*);
-    inline void employeeAdd(Employee);
+    inline void employeeAdd(Employee&);
+    inline void employeeAdd(OrderOperator&);
     Employee* employeeExist(const string&) const; // cautarea se face doar dupa ID
     void employeeDel(const string&);
     void employeeSet(const string&, const string&);
@@ -57,10 +58,12 @@ public:
      /* OPERATII CU PRODUSELE */
     ///////////////////////////
     void productAdd(Product*);
-    void productAdd(Product);
-    bool productExist(const string); // cautarea se face doar dupa ID
-    void productDel(const string);
-    void productSet(const string, int);
-    inline void productInf(const string) const;
-    inline void productsWrite() const;
+
+    template<class T>
+    void productAdd(T&);
+    vector<Product*>::const_iterator productExist(const string&) const; // cautarea se face doar dupa ID
+    void productDel(const string&);
+    void productSet(const string&, int);
+    inline void productInf(const string&, ostream& = cout) const;
+    inline void productsWrite(ostream& = cout) const;
 };

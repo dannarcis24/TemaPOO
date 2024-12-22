@@ -20,4 +20,5 @@ public:
 
     virtual const double getPrice(bool = true) const = 0;
     void setNumberProducts(const int&);
+    bool exist(const string&) const;
 };

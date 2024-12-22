@@ -140,13 +140,22 @@ Store::Store(const vector<Employee*>& vec1, const vector<Product*>& vec2, const 
 /* IMPLEMENTARE METODE PENTRU GESTIUNEA ANGAJATILOR */
 void Store::employeeAdd(Employee* elem)
 {
-    employees.push_back(elem);
+    if(elem->position() == "operator comenzi")
+        operators.push(dynamic_cast<OrderOperator*>(elem));
+    else
+        employees.push_back(elem);
     validation();
 }
 
-void Store::employeeAdd(Employee elem)
+void Store::employeeAdd(Employee& elem)
 {
     employees.push_back(&elem);
+    validation();
+}
+
+void Store::employeeAdd(OrderOperator& elem)
+{
+    operators.push(&elem);
     validation();
 }
 
@@ -269,3 +278,61 @@ void Store::employeesWrite(ostream& out)
 }   
 
 /* IMPLEMENTARE METODE PENTRU GESTIUNEA PRODUSELOR */
+void Store::productAdd(Product* elem)
+{
+    products.push_back(elem);
+    validation();
+}
+
+template<class T>
+void Store::productAdd(T& elem)
+{
+    auto aux = typeid(elem);
+    if(aux == typeid(Clothes) || aux == typeid(Disk) || aux == typeid(VintageDisk))
+        products.push.back(&elem);
+    else
+        throw DynamicException("produs_inexistent", "!! produsul nu exista in stocul magazinului !!\n\n");
+    validation();
+}
+
+vector<Product*>::const_iterator Store::productExist(const string& ID) const {
+    return find_if(products.begin(), products.end(), [&ID](vector<Product*>::iterator x) { return (*x)->exist(ID);});
+}
+
+void Store::productDel(const string& ID)
+{
+    vector<Product*>::const_iterator& elem = productExist(ID);
+    if(elem != products.end())
+        products.erase(elem);
+    else
+        throw DynamicException("produs_inexistent", "!! produsul cu ID ul " + ID + " nu exista in stocul magazinului !!\n\n");
+    validation();
+}
+
+void Store::productSet(const string& ID, int number)
+{
+    vector<Product*>::const_iterator& elem = productExist(ID);
+    if(elem != products.end())
+        (*elem)->setNumberProducts(number);
+    else
+        throw DynamicException("produs_inexistent", "!! produsul cu ID ul " + ID + " nu exista in stocul magazinului !!\n\n");
+    validation();
+}
+
+void Store::productInf(const string& ID, ostream& out) const
+{
+    vector<Product*>::const_iterator& elem =  productExist(ID);
+    if(elem != products.end())
+        out<<*elem;
+    else
+        throw DynamicException("produs_inexistent", "!! produsul cu ID ul " + ID + " nu exista in stocul magazinului !!\n\n");
+}
+
+void Store::productsWrite(ostream& out) const
+{
+    if(products.empty())
+        throw DynamicException("produse_inexistente", "!! magazinul nu are nici un produs in stoc !!\n\n");
+    
+    for(auto& i : products)
+        out<<i<<'\n';
+}
