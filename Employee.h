@@ -9,9 +9,9 @@ protected:
     Date employment_date = Date();
 
     static const int salary_base = 3500, old = 100;
-    static int coefficient;
+    static double coefficient;
 
-    inline virtual void write(ostream&) const;
+    virtual void write(ostream&) const;
 
 public:
     Employee() = default;
@@ -25,7 +25,7 @@ public:
     // de implementat citirea
 
     virtual const int salary() const;
-    inline void setName(const string&);
+    void setName(const string&);
     const string position() const;
     bool exist(const string&) const;
 

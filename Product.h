@@ -1,14 +1,15 @@
 #include "Employee.h"
+#include <typeinfo>
 
 class Product {
+    static long long number;
+    
 protected:
     string name, ID = "#0";
     unsigned int number_products = 0, price_base = 0;
 
-    static long long number;
-
-    inline virtual void write(ostream&) const;
-    inline virtual void read(istream&);
+    virtual void write(ostream&) const;
+    virtual void read(istream&);
 
 public:
     Product() = default;

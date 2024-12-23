@@ -1,19 +1,19 @@
 #include "Order.h"
 
-long long Order::numar = 0;
+long long Order::number = 0;
 
 void Order::validation(vector<Product>& vec) 
 {
     if(vec.empty())
-        throw DynamicException("comanda_invalida", "!! o comanda trebuie sa aiba cel putin un Product !!\n\n");
+        throw DynamicException("comanda_invalida", "!! o comanda trebuie sa aiba cel putin un produs !!\n\n");
     if(vec.size() > 8)
         throw DynamicException("comanda_invalida", "!! o comanda poate sa contina maxim 5discuri si 3artcole vestimentare !!\n\n");
     
-    int disk = 0, number = 0, price = 0;
+    int disk = 0, nr = 0, price = 0;
     for(auto i = vec.begin(); i != vec.end(); i++)
     {
         if(typeid(*i) == typeid(Clothes())) {
-            if(++number > 3)
+            if(++nr > 3)
                 throw DynamicException("comanda_invalida", "!! o comanda poate sa contina maxim 5discuri si 3artcole vestimentare !!\n\n");
             }
         else
@@ -27,7 +27,7 @@ void Order::validation(vector<Product>& vec)
     if(price < 100)
         throw DynamicException("comanda_invalida", "!! o comanda trebuie sa aiba pretul minim de 100lei, fara costuri suplimentare !!\n\n");   
 
-    ID = "$" + to_string(Order::numar++);     
+    ID = "$" + to_string(Order::number++);     
 }
 
 Order::Order(vector<Product>& vec, const Date& date, int t): processing_date(date), time(t) {
@@ -54,7 +54,7 @@ istream& operator>>(istream& in, Order& elem)
     getline(in, aux);
     elem.time = stoi(aux);
 
-    // trebuie sa ma opresc la o linie goala sau nush, poate iau numarul de elemente, desi e o coada cu prioritatie, care e tot un vector pana la urma, daca iau cazul cu vector e lejer
+    // trebuie sa ma opresc la o linie goala sau nush, poate iau numberul de elemente, desi e o coada cu prioritatie, care e tot un vector pana la urma, daca iau cazul cu vector e lejer
 
     return in;
 }

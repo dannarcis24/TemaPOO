@@ -89,7 +89,7 @@ bool Date::esteMajor() const
     if(month < now->tm_mon || (month == now->tm_mon && day < now->tm_mday))
         age--;
 
-    return (age > 18);
+    return (age >= 18);
 }
 
 const int Date::years() const 

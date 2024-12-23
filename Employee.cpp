@@ -1,21 +1,22 @@
 #include "Employee.h"
 
 unsigned long long Employee::number = 0;
+double Employee::coefficient = 1;
 
 void Employee::validationString(const string sir, bool tip) const
 {
     int dim = sir.length();
     if(dim < 3 || dim > 30)
-        throw DynamicException(tip ? "name1_invalid", "!! name1le nu poate sa contina mai putin de 3litere sau mai mult 30caractere !!\n\n" 
-                           : "name2_invalid", "!! name2le nu poate sa contina mai putin de 3litere sau mai mult 30caractere !!\n\n");
+        throw (tip ? DynamicException("nume_invalid", "!! numele nu poate sa contina mai putin de 3litere sau mai mult 30caractere !!\n\n") 
+            : DynamicException("prenume_invalid", "!! prenumele nu poate sa contina mai putin de 3litere sau mai mult 30caractere !!\n\n"));
     if(sir[0] < 'A' || sir[0] > 'Z') 
-        throw DynamicException(tip ? "name1_invalid", "!! name1le trebuie sa aiba prima litera mare si restul litere mici ale alfabetului englez !!\n\n" 
-                           : "name2_invalid", "!! name2le trebuie sa aiba prima litera mare si restul litere mici ale alfabetului englez !!\n\n");
+        throw (tip ? DynamicException("nume_invalid", "!! numele trebuie sa aiba prima litera mare si restul litere mici ale alfabetului englez !!\n\n") 
+            : DynamicException("prenume_invalid", "!! prenumele trebuie sa aiba prima litera mare si restul litere mici ale alfabetului englez !!\n\n"));
 
     if(tip == 1) {
         for(register int i = 1; i < dim; i++)
             if(sir[i] < 'a' || sir[i] > 'z')
-                throw DynamicException("name1_invalid", "!! name1le trebuie sa aiba prima litera mare si restul litere mici ale alfabetului englez !!\n\n");
+                throw DynamicException("nume_invalid", "!! numele trebuie sa aiba prima litera mare si restul litere mici ale alfabetului englez !!\n\n");
     }
     else
     {
@@ -25,10 +26,10 @@ void Employee::validationString(const string sir, bool tip) const
             if(litera_mare)
             {
                 if(sir[i] == '-' || sir[i] == ' ')
-                    throw DynamicException("name2_invalid", "!! name2le trebuie sa fie separate printr-o singura cratima sau un singur spatiu !!\n\n");
+                    throw DynamicException("prenume_invalid", "!! prenumele trebuie sa fie separate printr-o singura cratima sau un singur spatiu !!\n\n");
 
                 if(sir[i] < 'A' || sir[i] > 'Z')
-                    throw DynamicException("name2_invalid", "!! name2le trebuie sa aiba prima litera mare !!\n\n");
+                    throw DynamicException("prenume_invalid", "!! prenumele trebuie sa aiba prima litera mare !!\n\n");
                 else
                     litera_mare = false;
             }
@@ -40,12 +41,12 @@ void Employee::validationString(const string sir, bool tip) const
                 }
                 else
                     if(sir[i] < 'a' || sir[i] > 'z')
-                        throw DynamicException("name2_invalid", "!! name2le trebuie sa aiba prima litera mare si restul litere mici ale alfabetului englez !!\n\n");
+                        throw DynamicException("prenumele_invalid", "!! prenumele trebuie sa aiba prima litera mare si restul litere mici ale alfabetului englez !!\n\n");
                     else
                         separator = false;
 
         if(sir.back() == '-' || sir.back() == ' ')
-            throw DynamicException("name2_invalid", "!! ultimul caracter al name2lui trebuie sa fie o litera mica a alfabetului englez !!\n\n");
+            throw DynamicException("prenumele_invalid", "!! ultimul caracter al prenumelui trebuie sa fie o litera mica a alfabetului englez !!\n\n");
     }
 }
 
@@ -60,7 +61,7 @@ const Date Employee::birthday() const
     if(CNP[0] >= '5' && CNP[0] <= '8')
         data += "20";
     else
-        throw DynamicException("cnp_invalid", "\n!! primul caracter din CNP este incorect, ani recunoscuti: 1800-2099 !!\n\n");
+        throw DynamicException("cnp_invalid", "!! primul caracter din CNP este incorect, ani recunoscuti: 1800-2099 !!\n\n");
     
     return Date(data + CNP.substr(1, 2));
 }
@@ -76,7 +77,7 @@ void Employee::validationCNP() const
     
     Date data_nasterii = birthday();
     if(!data_nasterii.esteMajor())
-        throw DynamicException("data_invalida", "!! persoana, care trebuie Employeea, trebuie sa aiba minim 18ani impliniti !!\n\n");
+        throw DynamicException("data_invalida", "!! persoana, care trebuie angajata, trebuie sa aiba minim 18ani impliniti !!\n\n");
 
     int jud = stoi(CNP.substr(7, 2));
     if(jud < 1 || (jud > 46 && jud < 50) || jud > 52)
@@ -84,10 +85,10 @@ void Employee::validationCNP() const
     if(CNP.substr(9, 3) == "000")
         throw DynamicException("cnp_invalid", "!! componenta NNN din CNP nu poate fi 000 !!\n\n");
 
-    int control[12] = {2, 7, 6, 5, 4, 3, 2, 7, 6, 5, 4, 3}, c = 0;
-    for(register int i = 0; i < 13; i++)
-        c = (CNP[i] - '0') * control[i];
-    c = (c % 11 == 10) ? 1 : (c % 11);
+    int control[12] = {2, 7, 9, 1, 4, 6, 3, 5, 8, 2, 7, 9}, c = 0;
+    for(register int i = 0; i < 12; i++)
+        c += (CNP[i] - '0') * control[i];
+    c = ((c % 11 == 10) ? 1 : (c % 11));
 
     if(c != CNP[12] - '0')
         throw DynamicException("cnp_invalid", "!! cifra de control nu este corecta, deci CNP ul este invalid !!\n\n");

@@ -7,7 +7,7 @@ class Order {
     string ID = "$0";
     int time;
 
-    static long long numar;
+    static long long number;
 
     inline void validation(vector<Product>&);
 

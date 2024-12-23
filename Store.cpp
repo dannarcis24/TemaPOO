@@ -1,7 +1,6 @@
 #include "Store.h"
 #include <algorithm>
 #include <type_traits>
-#include <typeinfo>
 
 void Store::validation() const
 {
@@ -28,7 +27,7 @@ void Store::validation() const
     if(products.size() < 6)
         throw DynamicException("magazin_nefunctional", "!! magazinul trebuie sa aiba cel putin cate 2produse din fiecare tip !!\n\n");
     
-    number = vector(3, 0);
+    number = vector<int>(3, 0);
     for(auto& i : products)
     {
         if(typeid(i) == typeid(Clothes))
@@ -46,117 +45,20 @@ void Store::validation() const
         throw DynamicException("magazin_nefunctional", "!! magazinul trebuie sa aiba cel putin cate 2produse din fiecare tip !!\n\n");
 }
 
-template<class T1, class T2, class T3, class T4>
-void Store::setInfo(const vector<T1>& vec1, const vector<T2>& vec2, const vector<T3>& vec3, const vector<T4>& vec4) 
-{
-    for(auto& i : vec1)
-        if(!is_pointer<T1>::value)
-            employees.push_back(&i);
-
-    for(auto& i : vec2)
-        if(!is_pointer<T1>::value)
-            products.push_back(&i);
-    
-    for(auto& i : vec3)
-        if(is_pointer<T2>::value)
-            operators.push(i);
-        else
-            operators.push(&i);
-    
-    for(auto& i : vec4)
-        if(is_pointer<T3>::value)
-            orders.push(i);
-        else
-            orders.push(&i);
-
-    validation();
-}
-
-/* IMPLEMENTARE CONSTRUCTORII */
-Store::Store(const vector<Employee>& vec1, const vector<Product>& vec2, const vector<OrderOperator>& vec3, const vector<Order>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4);
-}
-
-Store::Store(const vector<Employee*>& vec1, const vector<Product>& vec2, const vector<OrderOperator>& vec3, const vector<Order>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee>& vec1, const vector<Product*>& vec2, const vector<OrderOperator>& vec3, const vector<Order>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee>& vec1, const vector<Product>& vec2, const vector<OrderOperator*>& vec3, const vector<Order>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee>& vec1, const vector<Product>& vec2, const vector<OrderOperator>& vec3, const vector<Order*>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee*>& vec1, const vector<Product*>& vec2, const vector<OrderOperator>& vec3, const vector<Order>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee*>& vec1, const vector<Product>& vec2, const vector<OrderOperator*>& vec3, const vector<Order>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee*>& vec1, const vector<Product>& vec2, const vector<OrderOperator>& vec3, const vector<Order*>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee>& vec1, const vector<Product*>& vec2, const vector<OrderOperator*>& vec3, const vector<Order>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee>& vec1, const vector<Product*>& vec2, const vector<OrderOperator>& vec3, const vector<Order*>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4);
-}
-
-Store::Store(const vector<Employee>& vec1, const vector<Product>& vec2, const vector<OrderOperator*>& vec3, const vector<Order*>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee*>& vec1, const vector<Product*>& vec2, const vector<OrderOperator*>& vec3, const vector<Order>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee*>& vec1, const vector<Product*>& vec2, const vector<OrderOperator>& vec3, const vector<Order*>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee*>& vec1, const vector<Product>& vec2, const vector<OrderOperator*>& vec3, const vector<Order*>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee>& vec1, const vector<Product*>& vec2, const vector<OrderOperator*>& vec3, const vector<Order*>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
-Store::Store(const vector<Employee*>& vec1, const vector<Product*>& vec2, const vector<OrderOperator*>& vec3, const vector<Order*>& vec4) {
-    setInfo(vec1, vec2, vec3, vec4); 
-}
-
 /* IMPLEMENTARE METODE PENTRU GESTIUNEA ANGAJATILOR */
-void Store::employeeAdd(Employee* elem)
-{
+void Store::employeeAdd(Employee* elem) {
     if(elem->position() == "operator comenzi")
         operators.push(dynamic_cast<OrderOperator*>(elem));
     else
         employees.push_back(elem);
-    validation();
 }
 
-void Store::employeeAdd(Employee& elem)
-{
+void Store::employeeAdd(Employee& elem) {
     employees.push_back(&elem);
-    validation();
 }
 
-void Store::employeeAdd(OrderOperator& elem)
-{
+void Store::employeeAdd(OrderOperator& elem) {
     operators.push(&elem);
-    validation();
 }
 
 Employee* Store::employeeExist(const string& ID) const
@@ -164,7 +66,7 @@ Employee* Store::employeeExist(const string& ID) const
     if(employees.empty() && operators.empty())
         return nullptr;
     
-    for(auto& i = employees.begin(); i != employees.end(); i++)
+    for(auto i = employees.begin(); i != employees.end(); i++)
         if((*i)->exist(ID))
             return *i;
 
@@ -183,7 +85,7 @@ void Store::employeeDel(const string& ID)
 
         vector<OrderOperator*> aux;
         bool ok = false;
-        for(auto& i = operators.top(); !operators.empty(); operators.pop())
+        for(auto i = operators.top(); !operators.empty(); operators.pop())
             if(!i->exist(ID))
                 aux.push_back(i);
             else
@@ -195,6 +97,7 @@ void Store::employeeDel(const string& ID)
         if(!ok)
             throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
     }
+    validation();
 }
 
 void Store::employeeSet(const string&ID, const string& name)
@@ -209,7 +112,7 @@ void Store::employeeSet(const string&ID, const string& name)
 
         vector<OrderOperator*> aux;
         bool ok = false;
-        for(auto& i = operators.top(); !operators.empty(); operators.pop())
+        for(auto i = operators.top(); !operators.empty(); operators.pop())
             if(!i->exist(ID))
                 aux.push_back(i);
             else
@@ -238,7 +141,7 @@ void Store::employeeInf(const string& ID, ostream& out)
 
         vector<OrderOperator*> aux;
         bool ok = false;
-        for(auto& i = operators.top(); !operators.empty(); operators.pop())
+        for(auto i = operators.top(); !operators.empty(); operators.pop())
             if(!i->exist(ID))
                 aux.push_back(i);
             else
@@ -266,7 +169,7 @@ void Store::employeesWrite(ostream& out)
     if(!operators.empty())
     {
         vector<OrderOperator*> aux;
-        for(auto& i = operators.top(); !operators.empty(); operators.pop())
+        for(auto i = operators.top(); !operators.empty(); operators.pop())
         {
             out<<i<<'\n';
             aux.push_back(i);
@@ -278,10 +181,8 @@ void Store::employeesWrite(ostream& out)
 }   
 
 /* IMPLEMENTARE METODE PENTRU GESTIUNEA PRODUSELOR */
-void Store::productAdd(Product* elem)
-{
+void Store::productAdd(Product* elem) {
     products.push_back(elem);
-    validation();
 }
 
 template<class T>
@@ -289,19 +190,18 @@ void Store::productAdd(T& elem)
 {
     auto aux = typeid(elem);
     if(aux == typeid(Clothes) || aux == typeid(Disk) || aux == typeid(VintageDisk))
-        products.push.back(&elem);
+        products.push_back(&elem);
     else
         throw DynamicException("produs_inexistent", "!! produsul nu exista in stocul magazinului !!\n\n");
-    validation();
 }
 
 vector<Product*>::const_iterator Store::productExist(const string& ID) const {
-    return find_if(products.begin(), products.end(), [&ID](vector<Product*>::iterator x) { return (*x)->exist(ID);});
+    return find_if(products.begin(), products.end(), [&ID](Product* x) { return x->exist(ID);});
 }
 
 void Store::productDel(const string& ID)
 {
-    vector<Product*>::const_iterator& elem = productExist(ID);
+    vector<Product*>::const_iterator elem = productExist(ID);
     if(elem != products.end())
         products.erase(elem);
     else
@@ -311,17 +211,16 @@ void Store::productDel(const string& ID)
 
 void Store::productSet(const string& ID, int number)
 {
-    vector<Product*>::const_iterator& elem = productExist(ID);
+    vector<Product*>::const_iterator elem = productExist(ID);
     if(elem != products.end())
         (*elem)->setNumberProducts(number);
     else
         throw DynamicException("produs_inexistent", "!! produsul cu ID ul " + ID + " nu exista in stocul magazinului !!\n\n");
-    validation();
 }
 
 void Store::productInf(const string& ID, ostream& out) const
 {
-    vector<Product*>::const_iterator& elem =  productExist(ID);
+    vector<Product*>::const_iterator elem =  productExist(ID);
     if(elem != products.end())
         out<<*elem;
     else

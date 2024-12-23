@@ -1,7 +1,5 @@
 #include "OrderOperator.h"
 
-int Employee::coefficient = 1;
-
 OrderOperator::OrderOperator(vector<Order>& vec)
 {
     if(vec.size() > 3)
