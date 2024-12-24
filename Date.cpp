@@ -69,7 +69,7 @@ istream& operator>>(istream& in, Date& elem)
     if(&in == &cin)
         cout<<"Date este (zz.ll.aaaa): ";
     string aux;
-    in>>aux;
+    getline(in, aux);
     elem = Date(aux);
 
     return in;

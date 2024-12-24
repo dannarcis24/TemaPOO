@@ -18,10 +18,12 @@ class Store {
     priority_queue<OrderOperator*, vector<OrderOperator*>, Compare> operators;
     priority_queue<Order*, vector<Order*>, Compare> orders;
 
-    inline void validation() const;
+    inline void validationEmployees() const;
+    inline void validationProducts() const;
 
 public:
     Store() = default;
+    ~Store() = default;
 
       //////////////////////////
      /* OPERATII CU ANGAJATI */

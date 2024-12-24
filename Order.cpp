@@ -30,6 +30,10 @@ void Order::validation(vector<Product>& vec)
     ID = "$" + to_string(Order::number++);     
 }
 
+Order::Order() {
+    Order::number++;
+}
+
 Order::Order(vector<Product>& vec, const Date& date, int t): processing_date(date), time(t) {
     validation(vec);
 }

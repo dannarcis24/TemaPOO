@@ -7,11 +7,11 @@ void Employee::validationString(const string sir, bool tip) const
 {
     int dim = sir.length();
     if(dim < 3 || dim > 30)
-        throw (tip ? DynamicException("nume_invalid", "!! numele nu poate sa contina mai putin de 3litere sau mai mult 30caractere !!\n\n") 
-            : DynamicException("prenume_invalid", "!! prenumele nu poate sa contina mai putin de 3litere sau mai mult 30caractere !!\n\n"));
+        (tip ? throw DynamicException("nume_invalid", "!! numele nu poate sa contina mai putin de 3litere sau mai mult 30caractere !!\n\n") 
+            : throw DynamicException("prenume_invalid", "!! prenumele nu poate sa contina mai putin de 3litere sau mai mult 30caractere !!\n\n"));
     if(sir[0] < 'A' || sir[0] > 'Z') 
-        throw (tip ? DynamicException("nume_invalid", "!! numele trebuie sa aiba prima litera mare si restul litere mici ale alfabetului englez !!\n\n") 
-            : DynamicException("prenume_invalid", "!! prenumele trebuie sa aiba prima litera mare si restul litere mici ale alfabetului englez !!\n\n"));
+        (tip ? throw DynamicException("nume_invalid", "!! numele trebuie sa aiba prima litera mare si restul litere mici ale alfabetului englez !!\n\n") 
+            : throw DynamicException("prenume_invalid", "!! prenumele trebuie sa aiba prima litera mare si restul litere mici ale alfabetului englez !!\n\n"));
 
     if(tip == 1) {
         for(register int i = 1; i < dim; i++)
@@ -55,15 +55,15 @@ const Date Employee::birthday() const
     string data = CNP.substr(5, 2) + '.' + CNP.substr(3, 2) + '.';
 
     if(CNP[0] == '1' || CNP[0] == '2')
-        data += "19";
+        return Date(data + "19" + CNP.substr(1, 2));
     if(CNP[0] == '3' || CNP[0] == '4')
-        data += "18";
-    if(CNP[0] >= '5' && CNP[0] <= '8')
-        data += "20";
+        return Date(data + "18" + CNP.substr(1, 2));
+    if(CNP[0] == '5' || CNP[0] == '6')
+        return Date(data + "20" + CNP.substr(1, 2));
+    if(CNP[0] == '7' || CNP[0] == '8')
+        throw DynamicException("rezident", "!! nu se poate extrage anul nasterii pentru persoanele rezidente !!\n\n");
     else
         throw DynamicException("cnp_invalid", "!! primul caracter din CNP este incorect, ani recunoscuti: 1800-2099 !!\n\n");
-    
-    return Date(data + CNP.substr(1, 2));
 }
 
 void Employee::validationCNP() const
@@ -104,6 +104,10 @@ void Employee::validation()
     coefficient = (job ? 0.75 : 1.25);
 }
 
+Employee::Employee() {
+    Employee::number++;
+}
+
 Employee::Employee(const string& name1, const string& name2, const string& cod, const Date& date, bool type): last_name(name1), first_name(name2), CNP(cod), employment_date(date), job(type) {
     validation();
 }
@@ -128,7 +132,7 @@ void Employee::setName(const string& sir)
 
 void Employee::write(ostream& out) const
 {
-    out<<"////// INFORMATII DESPRE ANGAJATUL: "<<first_name<<' '<<last_name<<" //////\n\n";
+    out<<"////// INFORMATII DESPRE ANGAJATUL: "<<last_name<<' '<<first_name<<" //////\n\n";
 
     out<<"CNP: "<<CNP<<"\nID: "<<ID<<'\n';
     out<<"Pozitie: "<<(coefficient != 1 ? (job ? "asistent" : "manager") : "operator de comenzi")<<'\n';
@@ -145,6 +149,76 @@ ostream& operator<<(ostream& out, const Employee elem)
 {
     elem.write(out);
     return out;
+}
+
+void Employee::read(istream& in)
+{
+    if(&in == &cin)
+        cout<<"Introduceti pozitia angajatului (manager/asistent/operator comenzi): ";
+    string pozitie;
+    getline(in, pozitie);
+
+    if(pozitie == "manager") {   
+        job = false;
+        coefficient = 1.25;
+    }
+    else
+        if(pozitie == "asistent") {
+            job = true;
+            coefficient = 0.75;
+        }
+        else
+            if(pozitie == "operator comenzi")
+            {
+                job = true;
+                coefficient = 1;
+            }
+            else
+                throw DynamicException("pozitie_invalida", "!! pozitia angajatului trebuie sa fie una dintre cele trei: manager/asistent/operator comenzi !!\n\n");
+
+    if(&in == &cin)
+        cout<<"Introduceti numele: ";
+    getline(in, last_name);
+    validationString(last_name);
+
+    if(&in == &cin)
+        cout<<"Introduceti prenumele: ";
+    getline(in, first_name);
+    validationString(first_name, 0);
+
+    if(&in == &cin)
+        cout<<"Introduceti CNP ul: ";
+    getline(in, CNP);
+    validationCNP();
+
+    if(&in == &cin)
+        cout<<"Introduceti data angajarii: ";
+    in>>employment_date;
+}
+
+istream& operator>>(istream& in, Employee& elem)
+{
+    Employee aux;
+    
+    try {
+        aux.read(in);
+        if(Employee::coefficient == 1)
+            throw DynamicException("pozitie_invalida", "!! pentru a retine un operator de comenzi, trebuie sa folositi tipul OrderOperator !!\n\n");
+    } catch(const exception& e) { Employee::number--; throw;}
+    elem = aux;
+
+    return in;
+}
+
+istream& operator>>(istream& in, Employee* elem)
+{  
+    try {
+        elem->read(in);
+        if(Employee::coefficient == 1)
+            throw DynamicException("pozitie_invalida", "!! pentru a retine un operator de comenzi, trebuie sa folositi tipul OrderOperator !!\n\n");
+    } catch(const exception& e) { Employee::number--; throw;}
+
+    return in;
 }
 
 const string Employee::position() const {

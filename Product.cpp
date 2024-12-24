@@ -2,6 +2,10 @@
 
 long long Product::number = 0;
 
+Product::Product() {
+    Product::number++;
+}
+
 Product::Product(const string& name1, int number1, int price): name(name1), number_products(number1), price_base(price) { 
     if(name.empty())
         throw DynamicException("denumire_invalida", "!! denumirea unui produs nu poate fi un sir gol !!\n\n");
@@ -35,13 +39,13 @@ ostream& operator<<(ostream& out, const Product* elem)
 void Product::read(istream& in)
 {
     if(&in == &cin)
-        cout<<"Denumirea productului: ";
+        cout<<"Denumirea produsului: ";
     in>>name;
     if(name.empty())
         throw DynamicException("denumire_invalida", "!! denumirea unui product nu poate fi un sir gol !!\n\n");
 
     if(&in == &cin)
-        cout<<"Numarul de producte: ";
+        cout<<"Numarul de produse: ";
     string aux;
     getline(in, aux);
     number_products = stoi(aux);
@@ -54,11 +58,8 @@ void Product::read(istream& in)
 
 istream& operator>>(istream& in, Product* elem) 
 {
-    Product *aux;
-    aux->Product::read(in);
-    aux->read(in);
-    delete elem;
-    elem = aux;
+    try{ elem->read(in);}
+    catch(const exception& e) { Product::number--; throw;}
 
     return in;
 }

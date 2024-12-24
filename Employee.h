@@ -12,15 +12,18 @@ protected:
     static double coefficient;
 
     virtual void write(ostream&) const;
+    virtual void read(istream&);
 
 public:
-    Employee() = default;
+    Employee();
     Employee(const string&, const string&, const string&, const Date&, bool);
     Employee(const string&, const string&, const string&, int, int, int, bool);
     Employee(const string&, const string&, const string&, const string&, bool);
 
     friend ostream& operator<<(ostream&, const Employee*);
     friend ostream& operator<<(ostream&, const Employee); 
+    friend istream& operator>>(istream&, Employee&);
+    friend istream& operator>>(istream&, Employee*);
 
     // de implementat citirea
 

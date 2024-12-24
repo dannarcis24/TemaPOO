@@ -12,7 +12,7 @@ class Order {
     inline void validation(vector<Product>&);
 
 public:
-    Order() = default;
+    Order();
     Order(vector<Product>&, const Date&, int);
     Order(vector<Product>&, const string&, int);
     Order(vector<Product>&, int, int, int, int);

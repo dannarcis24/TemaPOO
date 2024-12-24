@@ -12,7 +12,7 @@ protected:
     virtual void read(istream&);
 
 public:
-    Product() = default;
+    Product();
     Product(const string&, int, int);
     virtual ~Product() = default;
 

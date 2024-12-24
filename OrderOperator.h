@@ -12,6 +12,8 @@ public:
 
     friend ostream& operator<<(ostream&, const OrderOperator*);
     friend ostream& operator<<(ostream&, const OrderOperator);
+    friend istream& operator>>(istream&, OrderOperator&);
+    friend istream& operator>>(istream&, OrderOperator*);
 
     const int salary() const;
     

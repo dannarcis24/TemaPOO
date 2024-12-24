@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <type_traits>
 
-void Store::validation() const
+void Store::validationEmployees() const
 {
     if(employees.size() < 2)
         throw DynamicException("magazin_nefunctional", "!! magazinul trebuie sa aiba macar un managaer si un asistent !!\n\n");
@@ -26,8 +26,11 @@ void Store::validation() const
     
     if(products.size() < 6)
         throw DynamicException("magazin_nefunctional", "!! magazinul trebuie sa aiba cel putin cate 2produse din fiecare tip !!\n\n");
-    
-    number = vector<int>(3, 0);
+}
+
+void Store::validationProducts() const
+{
+    vector<int> number = vector<int>(3, 0);
     for(auto& i : products)
     {
         if(typeid(i) == typeid(Clothes))
@@ -97,7 +100,7 @@ void Store::employeeDel(const string& ID)
         if(!ok)
             throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
     }
-    validation();
+    validationEmployees();
 }
 
 void Store::employeeSet(const string&ID, const string& name)
@@ -206,7 +209,7 @@ void Store::productDel(const string& ID)
         products.erase(elem);
     else
         throw DynamicException("produs_inexistent", "!! produsul cu ID ul " + ID + " nu exista in stocul magazinului !!\n\n");
-    validation();
+    validationProducts();
 }
 
 void Store::productSet(const string& ID, int number)

@@ -57,6 +57,26 @@ ostream& operator<<(ostream& out, const OrderOperator elem)
     return out;
 }
 
+istream& operator>>(istream& in, OrderOperator& elem)
+{
+    OrderOperator aux;
+    aux.read(in);
+    if(Employee::coefficient != 1)
+        throw DynamicException("pozitie_invalida", "!! pentru a retine un manager sau asistent trebuie sa folositi tipul Employee !!\n\n");
+    elem = aux;
+
+    return in;
+}
+
+istream& operator>>(istream& in, OrderOperator* elem)
+{
+    OrderOperator aux;
+    aux.read(in);
+    *elem = aux;
+    
+    return in;
+}
+
 const int OrderOperator::ordersNumber() const {
     return orders.size();
 }
