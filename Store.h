@@ -18,6 +18,8 @@ class Store {
     priority_queue<OrderOperator*, vector<OrderOperator*>, Compare> operators;
     priority_queue<Order*, vector<Order*>, Compare> orders;
 
+    static unsigned long long orders_processed;
+
     inline void validationEmployees() const;
     inline void validationProducts() const;
 
@@ -61,4 +63,11 @@ public:
     void order2Operator();
     void orderFinish(ostream& = cout);
     void ordersDel();
+
+      ///////////////////////
+     /* OPERATII RAPOARTE */
+    ///////////////////////
+    void writeMostOrders();
+    void writeMostExpensive();
+    void writeBigSalary();
 };

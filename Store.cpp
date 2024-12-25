@@ -1,6 +1,7 @@
 #include "Store.h"
 #include <algorithm>
-#include <type_traits>
+
+unsigned long long Store::orders_processed = 0;
 
 void Store::validationEmployees() const
 {
@@ -297,11 +298,11 @@ void Store::order2Operator()
             }
 
         OrderOperator* aux = operators.top();
-        try{ aux->orderAdd(order);}
-        catch(const exception& e) { throw DynamicException(dynamic_cast<const DynamicException&>(e));}
-        
+        aux->orderAdd(order);
         operators.pop();
         operators.push(aux);
+
+        Store::orders_processed++;
     }
 }
 
@@ -325,4 +326,98 @@ void Store::orderFinish(ostream& out)
 void Store::ordersDel() {
     while(!orders.empty())
         orders.pop();
+}
+
+/* IMPLEMENTARE METODE PENTRU GESTIUNEA RAPOARTELOR */
+void Store::writeMostOrders()
+{
+    if(operators.empty())
+    {
+        cout<<"raport_invalid: !! nu exista nici un anagjat de tipul OPERATOR DE COMENZI !!\n\n";
+        return;
+    }
+
+    ofstream out("employee_the_most_orders_processed.csv");
+    if(!out.is_open())
+        cout<<"eroare_fisier !! nu se poate deschide fisierul !!";
+    else
+    {
+        vector<OrderOperator*> vec;
+        for(vec.push_back(operators.top()); !operators.empty(); operators.pop())
+            ;
+        for(auto i : vec)
+            operators.push(i);
+    
+        vector<OrderOperator*>::iterator ma = max(vec.begin(), vec.end(), 
+                [](vector<OrderOperator*>::iterator elem1, vector<OrderOperator*>::iterator elem2) { return ((*elem1)->allOrders() > (*elem2)->allOrders());});
+        if((*ma)->allOrders() == 0)
+            cout<<"raport_invalid: !! nu s-a realizat nici o procesare de comenzi !!\n\n";
+        else
+        {
+            out<<*ma;
+            cout<<"Raportul a fost creat cu succes!";
+        }
+        
+        out.close();
+    }
+}
+
+void Store::writeMostExpensive()
+{
+    if(operators.empty())
+    {
+        cout<<"raport_invalid: !! nu exista nici un anagjat de tipul OPERATOR DE COMENZI !!\n\n";
+        return;
+    }
+    
+    ofstream out("employee_the_most_expensive_orders.csv");
+    if(!out.is_open())
+        cout<<"eroare_fisier !! nu se poate deschide fisierul !!";
+    else
+    {
+        vector<OrderOperator*> vec;
+        for(vec.push_back(operators.top()); !operators.empty(); operators.pop())
+            ;
+        for(auto i : vec)
+            operators.push(i);
+
+        if(!count_if(vec.begin(), vec.end(), [](const OrderOperator* i) { return !(i->allOrders());}))
+            cout<<"raport_invalid: !! nu s-a realizat nici o procesare de comenzi !!\n\n";
+        else
+        {
+            sort(vec.begin(), vec.end(), [](const OrderOperator* elem1, const OrderOperator* elem2) { return (elem1->bonus4Orders() > elem2->bonus4Orders());});
+            out<<vec[0]<<'\n'<<vec[1]<<'\n'<<vec[2];
+        }
+        
+        out.close();
+    }
+}
+
+void Store::writeBigSalary()
+{
+    if(employees.empty() && operators.empty())
+    {
+        cout<<"raport_invalid: !! magazinul nu are nici un angajat !!\n\n";
+        return;
+    }
+
+    ofstream out("employees_the_highest_salary.csv");
+    if(!out.is_open())
+        cout<<"eroare_fisier !! nu se poate deschide fisierul !!";
+    else
+    {
+        vector<Employee*> vec;
+        for(vec.push_back(operators.top()); !operators.empty(); operators.pop())
+            ;
+        for(auto i : vec)
+            operators.push(dynamic_cast<OrderOperator*>(i));
+
+        vec.insert(vec.end(), employees.begin(), employees.end());
+        sort(vec.begin(), vec.end(), [](const Employee* elem1, const Employee* elem2) { return (elem1->salary() > elem2->salary());});
+        sort(vec.begin(), vec.begin() + 3, [](const Employee* elem1, const Employee* elem2) { return compareByName(elem1, elem2);});
+
+        out<<vec[0]<<'\n'<<vec[1]<<'\n'<<vec[2];
+        out.close();
+        cout<<"Raportul a fost creat cu succes!";
+    }
 }

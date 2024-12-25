@@ -119,5 +119,5 @@ bool Date::isBirthday() const
     time_t t = time(NULL); // se salveaza data curenta
     tm* now = localtime(&t);
 
-    return (now->tm_mday == day && ++now->tm_mon == month && now->tm_year + 1900 == year);
+    return (++now->tm_mon == month);
 }

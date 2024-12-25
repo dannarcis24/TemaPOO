@@ -2,9 +2,11 @@
 
 class OrderOperator: public Employee {
     vector<Order*> orders;
-    unsigned int bonus = 0, total_orders = 0;
+    double bonus = 0;
+    unsigned int total_orders = 0;
 
     void write(ostream&) const;
+    void write(ofstream&) const;
 
 public:
     OrderOperator() = default;
@@ -22,4 +24,6 @@ public:
     void orderAdd(Order*);
     void orderFinish();
     const int ordersNumber() const;
+    const int allOrders() const;
+    double bonus4Orders() const;
 };

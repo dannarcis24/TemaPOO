@@ -149,10 +149,11 @@ void Employee::setName(const string& sir)
 void Employee::write(ostream& out) const
 {
     out<<"////// INFORMATII DESPRE ANGAJATUL: "<<last_name<<' '<<first_name<<" //////\n\n";
+    out<<"CNP: "<<CNP<<"\nID: "<<ID<<'\n'<<"Pozitie: "<<position()<<'\n'<<"Data angajarii: "<<employment_date<<"\nSalariul pe luna curenta este: "<<salary()<<'\n';
+}
 
-    out<<"CNP: "<<CNP<<"\nID: "<<ID<<'\n';
-    out<<"Pozitie: "<<(coefficient != 1 ? (job ? "asistent" : "manager") : "operator de comenzi")<<'\n';
-    out<<"Data angajarii: "<<employment_date<<"\nSalariul pe luna curenta este: "<<salary()<<'\n';
+void Employee::write(ofstream& out) const {
+    out<<last_name<<','<<first_name<<','<<CNP<<','<<ID<<','<<position()<<','<<employment_date<<','<<salary();
 }
 
 ostream& operator<<(ostream& out, const Employee* elem) 
@@ -245,4 +246,8 @@ const string Employee::position() const {
 
 bool Employee::exist(const string& id) const {
     return (ID == id);
+}
+
+bool compareByName(const Employee* elem1, const Employee* elem2) {
+    return ((elem1->last_name + elem1->first_name) > (elem2->last_name + elem2->first_name));
 }

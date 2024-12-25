@@ -170,7 +170,7 @@ bool Order::verifStock(vector<Product*> products) const
     {
         bool ok = false;
         for(const auto& elem : products)
-            if(elem == order)
+            if(compare(order, elem))
                 if(elem->getNumber() >= order->getNumber())
                 {
                     ok = true;
@@ -183,7 +183,7 @@ bool Order::verifStock(vector<Product*> products) const
 
     for(const auto& order : list)
         for(const auto& elem : products)
-            if(elem == order)
+            if(compare(order, elem))
                 if(elem->getNumber() >= order->getNumber())
                 {
                     elem->setNumberProducts(elem->getNumber() - order->getNumber());

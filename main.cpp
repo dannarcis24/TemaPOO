@@ -1,7 +1,5 @@
 #include "Options.h"
 #include <windows.h>
-#include <fstream>
-#include <algorithm>
 
 inline void wait() {
 
@@ -107,6 +105,44 @@ inline void Option2(Store& m, bool& exit) {
     }
 }
 
+inline void Option4(Store& m, bool& exit) {
+    while(true)
+    {
+        system("cls");
+         cout<<"     ROCK the SHOP\nGENEREAREA RAPOARTELOR\n 1. Angajatul cu cele mai multe comenzi procesate\n"
+            <<"2. TOP 3angajati, care au gestionat cele mai valoroase comenzi\n3. TOP 3angajati, care au cel mai mare salariu in luna curenta\n"
+            <<" 4. Inapoi\n 5. Iesire\n\nOptiunea dvs. este: ";
+
+        string option;
+        getline(cin, option);;
+
+        try {
+            switch(stoi(option)) {
+                case 1: {
+                    m.writeMostOrders();
+                    break;
+                }
+                case 2: {
+                    m.writeMostExpensive();
+                    break;
+                }
+                case 3: {
+                    m.writeBigSalary();
+                    break;
+                }
+                case 4: return;
+                case 5: {
+                    exit = true;
+                    return;
+                }
+                default: cout<<"optiune invalida\n";
+            }
+        } catch(const exception& e) { cout<<"optiune invalida\n";}
+
+        wait();
+    }
+}
+
 int main()
 {  
     Store m;
@@ -115,7 +151,7 @@ int main()
     {
         system("cls");
         cout<<"     ROCK the SHOP\n1. Gestiunea angajatilor\n2. Gestiunea produselor\n"
-            <<"3. Gestiunea comenzilor\n4. Rapoarte\n5. Iesire\n\nOptiunea dvs. este: ";
+            <<"3. Gestiunea comenzilor\n4. Generarea rapoartelor\n5. Iesire\n\nOptiunea dvs. este: ";
         
         string option;
         getline(cin, option);;
@@ -137,7 +173,7 @@ int main()
                     break;
                 }
                 case 4: {
-                    // Option4(m, exit);
+                    Option4(m, exit);
                     break;
                 }
                 case 5: {

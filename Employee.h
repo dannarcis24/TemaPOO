@@ -1,4 +1,5 @@
 #include "Date.h"
+#include <fstream>
 
 class Employee {
     static unsigned long long number;
@@ -12,7 +13,8 @@ protected:
     static double coefficient;
 
     virtual void write(ostream&) const;
-    virtual void read(istream&);
+    virtual void write(ofstream&) const;
+    void read(istream&);
 
 public:
     Employee();
@@ -25,6 +27,7 @@ public:
     friend ostream& operator<<(ostream&, const Employee); 
     friend istream& operator>>(istream&, Employee&);
     friend istream& operator>>(istream&, Employee*);
+    friend bool compareByName(const Employee*, const Employee*);
 
     // de implementat citirea
 

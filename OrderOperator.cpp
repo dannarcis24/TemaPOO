@@ -50,6 +50,10 @@ void OrderOperator::write(ostream& out) const
     out<<"\nInformatii privind gestiunea operatorului\nNumarul total de comenzi procesate: "<<total_orders<<"\nBonusul acumulat, in urma comenzilor realizate: "<<bonus;
 }
 
+void OrderOperator::write(ofstream& out) const {
+    out<<','<<total_orders<<','<<bonus;
+}
+
 ostream& operator<<(ostream& out, const OrderOperator* elem) 
 {
     elem->write(out);
@@ -84,4 +88,12 @@ istream& operator>>(istream& in, OrderOperator* elem)
 
 const int OrderOperator::ordersNumber() const {
     return orders.size();
+}
+
+const int OrderOperator::allOrders() const {
+    return total_orders;
+}
+
+double OrderOperator::bonus4Orders() const {
+    return (bonus * total_orders);
 }
