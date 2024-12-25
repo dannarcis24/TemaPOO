@@ -14,10 +14,10 @@ int number()
         try {
             nr = stoi(option);
             if(nr < 0)
-                throw DynamicException("numar_invalid", "!! numarul trebuie sa fie un numar pozitiv nenul !!\n\n");
+                throw DynamicException("numar_invalid", "!! numarul trebuie sa fie un numar natural pozitiv nenul !!\n\n");
 
             return nr;
-        } catch(const exception&) { cout<<"numar_invalid: !! numarul trebuie sa fie un numar pozitiv nenul !!\n\n";}
+        } catch(const exception& e) { cout<<e.what();}
 
         cout<<"Daca doriti sa renuntati la a adauga, introduceti 0 la urmatorul pas.\n";
     }
@@ -29,10 +29,14 @@ int number(ifstream& in)
     string aux;
     getline(in, aux);
 
-    try { nr = stoi(aux);}
-    catch(const exception&) { 
+    try { 
+        nr = stoi(aux);
+        if(nr < 0)
+            throw DynamicException("numar_invalid", "!! numarul trebuie sa fie un numar natural pozitiv nenul !!\n\n");
+    }
+    catch(const exception& e) { 
         nr = 0;
-        throw DynamicException("numar_invalid", "!! numarul trebuie sa fie un numar pozitiv nenul !!\n\n");
+        cout<<e.what();
     }
 
     return nr;
@@ -62,22 +66,20 @@ void readEmployeeFromFile(Store& m, ifstream& in)
 
     for(register int i = 0; i < nr; i++)
     {
-        streampos pos = in.tellg();
         string option;
         getline(in, option);
-        in.seekg(pos);
 
         Employee* elem;
         if(option == "manager" || option == "asistent")
-        {
-            elem = new Employee;
-            cout<<1;
-        }
+            elem = new Employee(option);
         else
             if(option == "operator comenzi")
                 elem = new OrderOperator;
             else
-                throw DynamicException("pozitie_invalida", "!! pozitia trebuie sa fie una dintre cele trei (manager/asistent/operator comenzi) !!\n\n");
+            {
+                cout<<("pozitie_invalida", "!! pozitia trebuie sa fie una dintre cele trei (manager/asistent/operator comenzi) !!\n\n");
+                return;
+            }
 
         try{ in>>elem;}
         catch(const exception& e) { 
@@ -181,7 +183,10 @@ void readProductFromFile(Store& m, ifstream& in)
                 if(option == "disc vintage")
                     elem = new VintageDisk;
                 else
-                    throw DynamicException("pozitie_invalida", "!! pozitia trebuie sa fie una dintre cele trei (articol vestimentar/disc/disc vintage) !!\n\n");
+                {
+                    cout<<"pozitie_invalida", "!! pozitia trebuie sa fie una dintre cele trei (articol vestimentar/disc/disc vintage) !!\n\n";
+                    return;
+                }
 
         try{ in>>elem;}
         catch(const exception& e) { 
@@ -201,7 +206,7 @@ void addProduct(Store& m)
 
     if(option == "tastatura")
     {
-        cout<<"Pentru a adauga haine introduceti 0, pentru discuri introduceti 1, iar pentru discuri vintage introduceti 2:";
+        cout<<"Pentru a adauga haine introduceti 0, pentru discuri introduceti 1, iar pentru discuri vintage introduceti 2: ";
         getline(cin, option);
 
         if(option == "0")

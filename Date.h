@@ -13,6 +13,8 @@ public:
 
     friend ostream& operator<<(ostream&, const Date&);
     friend istream& operator>>(istream&, Date&);
+    friend bool operator==(const Date&, const Date&);
+    friend bool operator!=(const Date&, const Date&);
 
     bool esteMajor() const; // de gandit la un nume mai bun
     const int years() const;

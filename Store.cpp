@@ -288,9 +288,13 @@ void Store::order2Operator()
     for(Order* order = orders.top(); !orders.empty() && (operators.top())->ordersNumber() < 4; orders.pop())
     {
         bool ok = order->verifStock(products);
-        for(auto& i : products)
-            if(!i->getNumber())
-                productDel(i->getName(false));
+        auto back = products.begin();
+        for(auto i = products.begin(); i != products.end(); back = i, i++)
+            if((*i)->getNumber() == 0)
+            {
+                products.erase(i);
+                i = back;
+            }
 
         OrderOperator* aux = operators.top();
         try{ aux->orderAdd(order);}

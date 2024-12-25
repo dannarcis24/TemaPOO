@@ -6,6 +6,7 @@ class VintageDisk: public Disk {
 
     void write(ostream&) const;
     void read(istream&);
+    bool isEqual(const Product&) const;
 
 public:
     VintageDisk() = default;
@@ -16,6 +17,8 @@ public:
 
     friend ostream& operator<<(ostream&, const VintageDisk&);
     friend istream& operator>>(istream&, VintageDisk&);
+    friend bool operator==(const VintageDisk&, const VintageDisk&);
+    friend bool operator!=(const VintageDisk&, const VintageDisk&);
 
     const double getPrice(bool = true) const;
 };

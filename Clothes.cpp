@@ -27,15 +27,16 @@ ostream& operator<<(ostream& out, const Clothes& elem)
 
 void Clothes::read(istream& in)
 {
+    Product::read(in);
     if(&in == &cin)
         cout<<"Culoarea este: ";
-    in>>color;
+    getline(in, color);
     if(color.empty())
         throw DynamicException("culoare_invalida", "!! culoarea nu poate sa fie un sir gol !!\n\n");
 
     if(&in == &cin)
         cout<<"Marca este: ";
-    in>>brand;
+    getline(in, brand);
     if(brand.empty())
         throw DynamicException("marca_invalida", "!! marca nu poate sa fie un sir gol!!\n\n");
 }
@@ -43,9 +44,36 @@ void Clothes::read(istream& in)
 istream& operator>>(istream& in, Clothes& elem)
 {
     Clothes aux = elem;
-    aux.Product::read(in);
-    aux.read(in);
+    try{ aux.read(in);}
+    catch(const exception& e) { Product::number--; throw DynamicException(dynamic_cast<const DynamicException&>(e));}
     elem = aux;
 
     return in;
+}
+
+istream& operator>>(istream& in, Clothes* elem)
+{
+    Clothes aux;
+    try{ aux.read(in);}
+    catch(const exception& e) { Product::number--; throw DynamicException(dynamic_cast<const DynamicException&>(e));}
+    *elem = aux;
+
+    return in;
+}
+
+bool Clothes::isEqual(const Product& elem) const
+{
+    const Clothes* aux = dynamic_cast<const Clothes*>(&elem);
+    if(!aux)    
+        return false;
+
+    return (Product::isEqual(elem) && brand == aux->brand && color == aux->color); 
+}
+
+bool operator==(const Clothes& elem1, const Clothes& elem2) {
+    return elem1.isEqual(elem2);
+}
+
+bool operator!=(const Clothes& elem1, const Clothes& elem2) {
+    return !(elem1 == elem2);
 }

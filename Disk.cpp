@@ -41,21 +41,23 @@ ostream& operator<<(ostream& out, const Disk& elem)
 
 void Disk::read(istream& in)
 {
+    Product::read(in);
+
     if(&in == &cin)
         cout<<"Numele casei de Diskuri este: ";
-    in>>record_company;
+    getline(in, record_company);
     if(record_company.empty())
         throw DynamicException("casa_Disk_invalida", "!! casa de Disk nu poate sa fie un sir gol !!\n\n");
 
     if(&in == &cin)
         cout<<"Numele trupei este: ";
-    in>>band;
+    getline(in, band);
     if(band.empty())
         throw DynamicException("trupa_invalida", "!! numele trupei nu poate sa fie un sir gol !!\n\n");
 
     if(&in == &cin)
         cout<<"Numele albumului este: ";
-    in>>album_name;
+    getline(in, album_name);
     if(album_name.empty())
         throw DynamicException("album_invalid", "!! numele albumului nu poate sa fie un sir gol !!\n\n");
 
@@ -63,7 +65,7 @@ void Disk::read(istream& in)
         cout<<"Introduceti 0 pentru CD sau 1 pentru viniluri: ";
     string aux;
     getline(in, aux);
-    if(aux != "0" || aux != "1")
+    if(aux != "0" && aux != "1")
         throw DynamicException("argument_invalid", "!! pentru starea discului introduceti 1/0 !!\n\n");
     
     type = (aux == "0 " ? 0 : 1);
@@ -76,9 +78,26 @@ void Disk::read(istream& in)
 istream& operator>>(istream& in, Disk& elem)
 {
     Disk aux = elem;
-    aux.Product::read(in);
-    aux.read(in);
+    try{ aux.read(in);}
+    catch(const exception& e) {Product::number--; throw DynamicException(dynamic_cast<const DynamicException&>(e));}
     elem = aux;
 
     return in;
+}
+
+bool Disk::isEqual(const Product& elem) const
+{
+    const Disk* aux = dynamic_cast<const Disk*>(&elem);
+    if(!aux)    
+        return false;
+
+    return (Product::isEqual(elem) && record_company == aux->record_company && album_name == aux->album_name && sale_date == aux->sale_date && type == aux->type); 
+}
+
+bool operator==(const Disk& elem1, const Disk& elem2) {
+    return elem1.isEqual(elem2);
+}
+
+bool operator!=(const Disk& elem1, const Disk& elem2) {
+    return !(elem1 == elem2);
 }

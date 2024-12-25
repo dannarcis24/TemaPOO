@@ -19,6 +19,7 @@ public:
     Employee(const string&, const string&, const string&, const Date&, bool);
     Employee(const string&, const string&, const string&, int, int, int, bool);
     Employee(const string&, const string&, const string&, const string&, bool);
+    Employee(const string&);
 
     friend ostream& operator<<(ostream&, const Employee*);
     friend ostream& operator<<(ostream&, const Employee); 

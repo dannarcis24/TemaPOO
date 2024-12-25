@@ -75,6 +75,14 @@ istream& operator>>(istream& in, Date& elem)
     return in;
 }
 
+bool operator==(const Date& elem1, const Date& elem2) {
+    return (elem1.day == elem2.day && elem1.month == elem2.month && elem1.year == elem2.year);
+}
+
+bool operator!=(const Date& elem1, const Date& elem2) {
+    return !(elem1 == elem2);
+}
+
 bool Date::esteMajor() const
 {
     time_t t = time(NULL); // se salveaza data curenta

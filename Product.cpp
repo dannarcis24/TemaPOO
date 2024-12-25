@@ -40,7 +40,7 @@ void Product::read(istream& in)
 {
     if(&in == &cin)
         cout<<"Denumirea produsului: ";
-    in>>name;
+    getline(in, name);
     if(name.empty())
         throw DynamicException("denumire_invalida", "!! denumirea unui product nu poate fi un sir gol !!\n\n");
 
@@ -48,18 +48,24 @@ void Product::read(istream& in)
         cout<<"Numarul de produse: ";
     string aux;
     getline(in, aux);
-    number_products = stoi(aux);
+    try{ number_products = stoi(aux);
+        if(number_products <= 0)
+            throw DynamicException("-", "-");}
+    catch(const exception&) { throw DynamicException("numar_produse_invalid", "!! numarul de produse nu poate fi un numar negativ !!");}
 
     if(&in == &cin)
         cout<<"Pretul de baza: ";
     getline(in, aux);
-    price_base = stoi(aux);
+    try{ price_base = stoi(aux);
+        if(price_base <= 0)
+            throw DynamicException("-", "-");}
+    catch(const exception&) { throw DynamicException("pret_invalid", "!! pretul unui produs trebuie sa fie un numar pozitiv !!\n\n");}
 }
 
 istream& operator>>(istream& in, Product* elem) 
 {
     try{ elem->read(in);}
-    catch(const exception& e) { Product::number--; throw;}
+    catch(const exception& e) { throw DynamicException(dynamic_cast<const DynamicException&>(e));}
 
     return in;
 }
@@ -70,14 +76,24 @@ void Product::setNumberProducts(const int& nr) {
     number_products = nr;
 }
 
-bool Product::exist(const string& s, bool caz) const {
-    return (caz ? (ID == s) : (name == s));
-}
-
-const string Product::getName(bool caz) const {
-    return (caz ? name : ID);
+bool Product::exist(const string& id) const {
+    return (ID == id);
 }
 
 const int Product::getNumber() const {
     return number_products;
+}
+
+bool Product::isEqual(const Product& elem) const {
+    return (name == elem.name && price_base == elem.price_base);
+} 
+
+bool compare(const Product* elem1, const Product* elem2)
+{   
+    if(elem1 == nullptr || elem2 == nullptr)
+        return false;
+    if(typeid(*elem1) != typeid(*elem2))
+        return false;
+
+    return elem1->isEqual(*elem2);
 }

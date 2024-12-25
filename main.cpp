@@ -1,11 +1,12 @@
 #include "Options.h"
 #include <windows.h>
 #include <fstream>
+#include <algorithm>
 
-inline void error() 
-{
-    cout<<"Optiune invalida!\n";
-    system("pause"); 
+inline void wait() {
+
+    cout<<"Apasati ENTER pentru a continua...";
+    cin.get();
 }
 
 inline void Option1(Store& m, bool& exit) {
@@ -35,11 +36,13 @@ inline void Option1(Store& m, bool& exit) {
                     break;
                 }
                 case 4: {
-                    writeEmployee(m);
+                    try{ writeEmployee(m);}
+                    catch(const exception& e) { cout<<e.what();}
                     break;
                 }
                 case 5: {
-                    writeEmployee(m, true);
+                    try{ writeEmployee(m, true);}
+                    catch(const exception& e) { cout<<e.what();}
                     break;
                 }
                 case 6: return;
@@ -47,9 +50,11 @@ inline void Option1(Store& m, bool& exit) {
                     exit = true;
                     return;
                 }
-                default: error();
+                default: cout<<"optiune invalida\n";
             }
-        } catch(const exception&) { error();}
+        } catch(const exception&) { cout<<"optiune invalida\n";}
+
+        wait();
     }
 }
 
@@ -80,11 +85,13 @@ inline void Option2(Store& m, bool& exit) {
                     break;
                 }
                 case 4: {
-                    writeProducts(m);
+                    try{ writeProducts(m);}
+                    catch(const exception& e) { cout<<e.what();}
                     break;
                 }
                 case 5: {
-                    writeProducts(m, true);
+                    try{ writeProducts(m, true);}
+                    catch(const exception& e) { cout<<e.what();}
                     break;
                 }
                 case 6: return;
@@ -92,9 +99,11 @@ inline void Option2(Store& m, bool& exit) {
                     exit = true;
                     return;
                 }
-                default: error();
+                default: cout<<"optiune invalida\n";
             }
-        } catch(const exception& e) { error();}
+        } catch(const exception& e) { cout<<"optiune invalida\n";}
+
+        wait();
     }
 }
 
@@ -124,7 +133,7 @@ int main()
                 }
                 case 3: {
                     managementOrders(m);
-                    system("pause");
+                    wait();
                     break;
                 }
                 case 4: {
@@ -135,9 +144,9 @@ int main()
                     exit = true;
                     break;
                 }
-                default: error();
+                default: {cout<<"optiune invalida\n"; wait();}
             }
-        } catch(const exception&) { error();}
+        } catch(const exception&) { cout<<"optiune invalida\n"; wait();}
 
         if(exit)
         {

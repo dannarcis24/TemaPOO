@@ -106,6 +106,8 @@ void Employee::validation()
 
 Employee::Employee() {
     Employee::number++;
+    job = true;
+    coefficient = 1;
 }
 
 Employee::Employee(const string& name1, const string& name2, const string& cod, const Date& date, bool type): last_name(name1), first_name(name2), CNP(cod), employment_date(date), job(type) {
@@ -118,6 +120,20 @@ Employee::Employee(const string& name1, const string& name2, const string& cod, 
 
 Employee::Employee(const string& name1, const string& name2, const string& cod, const string& date, bool type): last_name(name1), first_name(name2), CNP(cod), employment_date(date), job(type) {
     validation();
+}
+
+Employee::Employee(const string& position)
+{
+    if(position == "manager")
+        job = false;
+    else
+        if(position == "asistent")
+            job = true;
+        else
+            throw DynamicException("posizitie_invalida", "!! pozitii valide: manager/asistent !!\n\n");
+    
+    ID = "@" + to_string(number++);
+    coefficient = (job ? 0.75 : 1.25);
 }
 
 const int Employee::salary() const {
@@ -154,27 +170,29 @@ ostream& operator<<(ostream& out, const Employee elem)
 void Employee::read(istream& in)
 {
     if(&in == &cin)
+    {
         cout<<"Introduceti pozitia angajatului (manager/asistent/operator comenzi): ";
-    string pozitie;
-    getline(in, pozitie);
+        string pozitie;
+        getline(in, pozitie);
 
-    if(pozitie == "manager") {   
-        job = false;
-        coefficient = 1.25;
-    }
-    else
-        if(pozitie == "asistent") {
-            job = true;
-            coefficient = 0.75;
+        if(pozitie == "manager") {   
+            job = false;
+            coefficient = 1.25;
         }
         else
-            if(pozitie == "operator comenzi")
-            {
+            if(pozitie == "asistent") {
                 job = true;
-                coefficient = 1;
+                coefficient = 0.75;
             }
             else
-                throw DynamicException("pozitie_invalida", "!! pozitia angajatului trebuie sa fie una dintre cele trei: manager/asistent/operator comenzi !!\n\n");
+                if(pozitie == "operator comenzi")
+                {
+                    job = true;
+                    coefficient = 1;
+                }
+                else
+                    throw DynamicException("pozitie_invalida", "!! pozitia angajatului trebuie sa fie una dintre cele trei: manager/asistent/operator comenzi !!\n\n");
+    }
 
     if(&in == &cin)
         cout<<"Introduceti numele: ";

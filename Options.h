@@ -51,7 +51,7 @@ void readProduct(Store& m)
         try{ cin>>elem;} 
         catch(const exception& e) { 
             delete elem; 
-            throw e.what(); 
+            cout<<e.what(); 
             i--;
             continue;
         }

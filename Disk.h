@@ -8,6 +8,7 @@ protected:
 
     void write(ostream&) const;
     void read(istream&);
+    bool isEqual(const Product&) const;
 
 public:
     Disk() = default;
@@ -17,6 +18,8 @@ public:
 
     friend ostream& operator<<(ostream&, const Disk&);
     friend istream& operator>>(istream&, Disk&);
+    friend bool operator==(const Disk&, const Disk&);
+    friend bool operator!=(const Disk&, const Disk&);
 
     const double getPrice(bool = true) const;
 

@@ -44,14 +44,16 @@ void VintageDisk::read(istream& in)
         cout<<"Coeficientul de raritate este: ";
     string aux;
     getline(in, aux);
-    rarity = stoi(aux);
-    if(rarity < 1 || rarity > 5)
-        throw DynamicException("coeficient_raritate_invalid", "!! coeficientul de raritate al unui disc vintage este cuprins intre 1-5 !!\n\n");
+    try{ 
+        rarity = stoi(aux);
+        if(rarity < 1 || rarity > 5)
+            throw DynamicException("-", "-");
+    } catch(const exception&) { throw DynamicException("coeficient_raritate_invalid", "!! coeficientul de raritate al unui disc vintage este cuprins intre 1-5 !!\n\n");}
 
     if(&in == &cin)
         cout<<"Daca starea discului este buna, introduceti 1, altfel 0: ";
     getline(in, aux);
-    if(aux != "0" || aux != "1")
+    if(aux != "0" && aux != "1")
         throw DynamicException("argument_invalid", "!! pentru starea discului introduceti 1/0 !!\n\n");
     
     mint  = (aux == "0 " ? 0 : 1);
@@ -60,9 +62,26 @@ void VintageDisk::read(istream& in)
 istream& operator>>(istream& in, VintageDisk& elem)
 {
     VintageDisk aux = elem;
-    aux.Disk::read(in);
-    aux.read(in);
+    try { aux.read(in);}
+    catch(const exception& e) { Product::number--; throw DynamicException(dynamic_cast<const DynamicException&>(e));}
     elem = aux;
 
     return in;
+}
+
+bool VintageDisk::isEqual(const Product& elem) const 
+{
+    const VintageDisk* aux = dynamic_cast<const VintageDisk*>(&elem);
+    if(!aux)
+        return false;
+    
+    return (Disk::isEqual(elem) && rarity == aux->rarity && mint == aux->mint);
+}
+
+bool operator==(const VintageDisk& elem1, const VintageDisk& elem2) {
+    return elem1.isEqual(elem2);
+}
+
+bool operator!=(const VintageDisk& elem1, const VintageDisk& elem2) {
+    return !(elem1 == elem2);
 }
