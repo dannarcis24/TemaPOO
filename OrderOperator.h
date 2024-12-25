@@ -10,6 +10,8 @@ public:
     OrderOperator() = default;
     OrderOperator(vector<Order>&);
 
+    ~OrderOperator();
+
     friend ostream& operator<<(ostream&, const OrderOperator*);
     friend ostream& operator<<(ostream&, const OrderOperator);
     friend istream& operator>>(istream&, OrderOperator&);
@@ -17,7 +19,7 @@ public:
 
     const int salary() const;
     
-    void orderAdd(Order&);
+    void orderAdd(Order*);
     void orderFinish();
     const int ordersNumber() const;
 };

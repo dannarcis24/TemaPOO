@@ -1,5 +1,8 @@
 #include "Store.h"
 
+// operator de citire pentru comenzi
+// feature: afisarea in fisier sa fie facuta doar in excell, e mai frumos XP
+
 /* FUNCTII PENTRU MODULARIZARE */
 int number();
 int number(ifstream&);
@@ -8,15 +11,15 @@ const string name();
 
 /* FUNCTII PENTRU GESTIUNEA ANGAJATILOR */
 template<class T>
-void readEmployee(Store& m, istream& in)
+void readEmployee(Store& m)
 {
-    unsigned int nr = (&in == &cin ? number() : number(dynamic_cast<ifstream&>(in)));
+    unsigned int nr = number();
     
     for(register int i = 0; i < nr; i++)
     {
         Employee* elem = new T;
         try{
-            in>>elem;
+            cin>>elem;
 
             if(typeid(T) == typeid(OrderOperator) && elem->position() != "operator comenzi")
                 throw DynamicException("pozitie_invalida", "!! pentru a retine un manager sau un asistent, trebuie sa folositi tipul Employee !!\n\n");
@@ -25,35 +28,41 @@ void readEmployee(Store& m, istream& in)
         } catch(const exception& e) { 
             delete elem; 
             cout<<e.what(); 
-            if(&in == &cin)
-                i--; 
+            i--;
             continue;
         } 
 
         m.employeeAdd(elem);
     }
 }
+void readEmployeeFromFile(Store&, ifstream&);
 void addEmployee(Store&);
+void writeEmployee(Store&, bool = false);
 
 /* FUNCTII PENTRU GESTIUNEA PRODUSELOR */
 template<class T>
-void readProduct(Store& m, istream& in)
+void readProduct(Store& m)
 {
-    unsigned int nr = (&in == &cin ? number() : number(dynamic_cast<ifstream&>(in)));
+    unsigned int nr = number();
     
     for(register int i = 0; i < nr; i++)
     {
         Product* elem = new T;
-        try{ in>>elem;} 
+        try{ cin>>elem;} 
         catch(const exception& e) { 
             delete elem; 
             throw e.what(); 
-            if(&in == &cin)
-                i--; 
+            i--;
             continue;
         }
 
         m.productAdd(elem);
     }
 }
+void readProductFromFile(Store&, ifstream&);
 void addProduct(Store&);
+void writeProducts(Store&, bool = false);
+
+/* FUNCTII PENTRU GESTIUNEA COMENZILOR */
+vector<Order*> readOrders(istream&);
+void managementOrders(Store&);

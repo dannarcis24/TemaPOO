@@ -70,6 +70,14 @@ void Product::setNumberProducts(const int& nr) {
     number_products = nr;
 }
 
-bool Product::exist(const string& ID) const {
-    return (this->ID == ID);
+bool Product::exist(const string& s, bool caz) const {
+    return (caz ? (ID == s) : (name == s));
+}
+
+const string Product::getName(bool caz) const {
+    return (caz ? name : ID);
+}
+
+const int Product::getNumber() const {
+    return number_products;
 }

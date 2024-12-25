@@ -10,17 +10,22 @@ OrderOperator::OrderOperator(vector<Order>& vec)
             orders.push_back(&(*i));
 }
 
+OrderOperator::~OrderOperator()
+{
+    for(auto& i : orders)
+        delete i;
+}
 
 const int OrderOperator::salary() const {
     return (Employee::salary() + bonus);
 }
 
-void OrderOperator::orderAdd(Order& elem)
+void OrderOperator::orderAdd(Order* elem)
 {
     if(orders.size() == 3)
         throw DynamicException("cerere_invalida", "!! un operator de comenzi nu poate gestiona mai mult de 3comenzi in paralel !!\n\n");
     
-    orders.push_back(&elem);
+    orders.push_back(elem);
 }
 
 void OrderOperator::orderFinish()

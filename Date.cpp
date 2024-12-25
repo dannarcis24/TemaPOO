@@ -67,7 +67,7 @@ ostream& operator<<(ostream& out, const Date& elem)
 istream& operator>>(istream& in, Date& elem)
 {
     if(&in == &cin)
-        cout<<"Date este (zz.ll.aaaa): ";
+        cout<<"(zz.ll.aaaa): ";
     string aux;
     getline(in, aux);
     elem = Date(aux);

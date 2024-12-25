@@ -23,7 +23,9 @@ class Store {
 
 public:
     Store() = default;
-    ~Store() = default;
+    ~Store();
+
+    void validation() const;
 
       //////////////////////////
      /* OPERATII CU ANGAJATI */
@@ -53,4 +55,10 @@ public:
       /////////////////////////
      /* OPERATII CU COMENZI */
     /////////////////////////
+    void orderAdd(const vector<Order*>&);
+    bool orderExist() const;
+    int orderNumber();
+    void order2Operator();
+    void orderFinish(ostream& = cout);
+    void ordersDel();
 };

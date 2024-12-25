@@ -48,6 +48,26 @@ void Store::validationProducts() const
         throw DynamicException("magazin_nefunctional", "!! magazinul trebuie sa aiba cel putin cate 2produse din fiecare tip !!\n\n");
 }
 
+void Store::validation() const{
+    validationEmployees();
+    validationProducts();
+}
+
+Store::~Store()
+{
+    for(auto& i : employees)
+        delete i;
+    
+    for(auto& i : products)
+        delete i;
+    
+    for(auto i = operators.top(); !operators.empty(); operators.pop())
+        delete i;
+
+    for(auto i = orders.top(); !orders.empty(); orders.pop())
+        delete i;
+}
+
 /* IMPLEMENTARE METODE PENTRU GESTIUNEA ANGAJATILOR */
 void Store::employeeAdd(Employee* elem) {
     if(elem->position() == "operator comenzi")
@@ -237,4 +257,68 @@ void Store::productsWrite(ostream& out) const
     
     for(auto& i : products)
         out<<i<<'\n';
+}
+
+/* IMPLEMENTARE METODE PENTRU GESTIUNEA COMENZILOR */
+void Store::orderAdd(const vector<Order*>& elem) {
+    for(auto& i : elem)
+        orders.push(i);
+}
+
+bool Store::orderExist() const {
+    return (!orders.empty() || (operators.top())->ordersNumber());
+}
+
+int Store::orderNumber() 
+{
+    vector<Order*> vec;
+
+    for(vec.push_back(orders.top()); !orders.empty(); orders.pop())
+        ;
+    orderAdd(vec);
+
+    return vec.size();
+}
+
+void Store::order2Operator()
+{
+    if(orders.empty())
+        throw DynamicException("comanda_inexistenta", "!! nu mai exista comenzi d procesat !!\n\n");
+
+    for(Order* order = orders.top(); !orders.empty() && (operators.top())->ordersNumber() < 4; orders.pop())
+    {
+        bool ok = order->verifStock(products);
+        for(auto& i : products)
+            if(!i->getNumber())
+                productDel(i->getName(false));
+
+        OrderOperator* aux = operators.top();
+        try{ aux->orderAdd(order);}
+        catch(const exception& e) { throw DynamicException(dynamic_cast<const DynamicException&>(e));}
+        
+        operators.pop();
+        operators.push(aux);
+    }
+}
+
+void Store::orderFinish(ostream& out)
+{
+    vector<OrderOperator*> vec;
+    for(vec.push_back(operators.top()); !orders.empty(); operators.pop())
+        ;
+    
+    out<<"Numarul de comenzi al fiecarui operator: ";
+    for(auto elem : vec)
+    {
+        elem->orderFinish();
+        operators.push(elem);
+
+        out<<elem->ordersNumber()<<' ';
+    }
+    out<<'\n';
+}
+
+void Store::ordersDel() {
+    while(!orders.empty())
+        orders.pop();
 }

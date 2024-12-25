@@ -192,7 +192,7 @@ void Employee::read(istream& in)
     validationCNP();
 
     if(&in == &cin)
-        cout<<"Introduceti data angajarii: ";
+        cout<<"Introduceti data angajarii ";
     in>>employment_date;
 }
 

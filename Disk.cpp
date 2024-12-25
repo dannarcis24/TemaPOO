@@ -67,6 +67,10 @@ void Disk::read(istream& in)
         throw DynamicException("argument_invalid", "!! pentru starea discului introduceti 1/0 !!\n\n");
     
     type = (aux == "0 " ? 0 : 1);
+
+    if(&in == &cin)
+        cout<<"Data vanzarii este ";
+    in>>sale_date;
 }
 
 istream& operator>>(istream& in, Disk& elem)

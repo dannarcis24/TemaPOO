@@ -1,5 +1,6 @@
 #include "Options.h"
 #include <windows.h>
+#include <fstream>
 
 inline void error() 
 {
@@ -16,7 +17,7 @@ inline void Option1(Store& m, bool& exit) {
             <<" 5. Afisare informatiilor despre toti angajatii\n 6. Inapoi\n 7. Iesire\n\nOptiunea dvs. este: ";
 
         string option;
-        getline(cin, option);;
+        getline(cin, option);
 
         try {
             switch(stoi(option)) {
@@ -34,11 +35,11 @@ inline void Option1(Store& m, bool& exit) {
                     break;
                 }
                 case 4: {
-                    m.employeeInf(searchID());
+                    writeEmployee(m);
                     break;
                 }
                 case 5: {
-                    m.employeesWrite();
+                    writeEmployee(m, true);
                     break;
                 }
                 case 6: return;
@@ -49,8 +50,6 @@ inline void Option1(Store& m, bool& exit) {
                 default: error();
             }
         } catch(const exception&) { error();}
-
-        system("pause");
     }
 }
 
@@ -72,7 +71,8 @@ inline void Option2(Store& m, bool& exit) {
                     break;
                 }
                 case 2: {
-                    m.productDel(searchID());
+                    try{ m.productDel(searchID());}
+                    catch(const exception& e) { cout<<e.what();}
                     break;
                 }
                 case 3: {
@@ -80,11 +80,11 @@ inline void Option2(Store& m, bool& exit) {
                     break;
                 }
                 case 4: {
-                    m.productInf(searchID());
+                    writeProducts(m);
                     break;
                 }
                 case 5: {
-                    m.productsWrite();
+                    writeProducts(m, true);
                     break;
                 }
                 case 6: return;
@@ -123,7 +123,8 @@ int main()
                     break;
                 }
                 case 3: {
-                    // Option3(m, exit);
+                    managementOrders(m);
+                    system("pause");
                     break;
                 }
                 case 4: {
@@ -136,7 +137,7 @@ int main()
                 }
                 default: error();
             }
-        } catch(const exception& e) { error();}
+        } catch(const exception&) { error();}
 
         if(exit)
         {
