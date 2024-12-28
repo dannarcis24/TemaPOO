@@ -35,12 +35,12 @@ void Store::validationProducts() const
     for(auto& i : products)
     {
         if(typeid(i) == typeid(Clothes))
-            number[0]++;
+            number[0] += i->getNumber();
         else
             if(typeid(i) == typeid(Disk))
-                number[1]++;
+                number[1] += i->getNumber();
             else
-                number[2]++;
+                number[2] += i->getNumber();
         
         if(count_if(number.begin(), number.end(), [](bool x) { return (x >= 2); }) == 3)
             break;
@@ -77,6 +77,10 @@ void Store::employeeAdd(Employee* elem) {
         employees.push_back(elem);
 }
 
+void Store::employeeAdd(OrderOperator* elem) {
+    operators.push(elem);
+}
+
 void Store::employeeAdd(Employee& elem) {
     employees.push_back(&elem);
 }
@@ -87,7 +91,7 @@ void Store::employeeAdd(OrderOperator& elem) {
 
 Employee* Store::employeeExist(const string& ID) const
 {
-    if(employees.empty() && operators.empty())
+    if(employees.empty())
         return nullptr;
     
     for(auto i = employees.begin(); i != employees.end(); i++)
@@ -109,11 +113,19 @@ void Store::employeeDel(const string& ID)
 
         vector<OrderOperator*> aux;
         bool ok = false;
-        for(auto i = operators.top(); !operators.empty(); operators.pop())
-            if(!i->exist(ID))
-                aux.push_back(i);
-            else
+        for(; !operators.empty(); operators.pop())
+        {
+            auto i = operators.top();
+
+            if(i->exist(ID))
+            {
                 ok = true;
+                operators.pop();
+                break;
+            }
+
+            aux.push_back(i);
+        }
 
         for(auto& i : aux)
             operators.push(i);
@@ -136,14 +148,21 @@ void Store::employeeSet(const string&ID, const string& name)
 
         vector<OrderOperator*> aux;
         bool ok = false;
-        for(auto i = operators.top(); !operators.empty(); operators.pop())
-            if(!i->exist(ID))
-                aux.push_back(i);
-            else
+        for(; !operators.empty(); operators.pop())
+        {
+            auto i = operators.top();
+
+            if(i->exist(ID))
             {
                 ok = true;
                 i->setName(name);
+                operators.pop();
+                operators.push(i);
+                break;
             }
+
+            aux.push_back(i);
+        }
 
         for(auto& i : aux)
             operators.push(i);
@@ -165,14 +184,21 @@ void Store::employeeInf(const string& ID, ostream& out)
 
         vector<OrderOperator*> aux;
         bool ok = false;
-        for(auto i = operators.top(); !operators.empty(); operators.pop())
-            if(!i->exist(ID))
-                aux.push_back(i);
-            else
+        for(; !operators.empty(); operators.pop())
+        {   
+            auto i = operators.top();
+
+            if(i->exist(ID))
             {
+                operators.pop();
+                operators.push(i);
                 ok = true;
                 out<<i;
+                break;
             }
+
+            aux.push_back(i);
+        }
 
         for(auto& i : aux)
             operators.push(i);
@@ -193,8 +219,9 @@ void Store::employeesWrite(ostream& out)
     if(!operators.empty())
     {
         vector<OrderOperator*> aux;
-        for(auto i = operators.top(); !operators.empty(); operators.pop())
+        for(; !operators.empty(); operators.pop())
         {
+            auto i = operators.top();
             out<<i<<'\n';
             aux.push_back(i);
         }
@@ -286,8 +313,10 @@ void Store::order2Operator()
     if(orders.empty())
         throw DynamicException("comanda_inexistenta", "!! nu mai exista comenzi d procesat !!\n\n");
 
-    for(Order* order = orders.top(); !orders.empty() && (operators.top())->ordersNumber() < 4; orders.pop())
+    for(; !orders.empty() && (operators.top())->ordersNumber() < 4; orders.pop())
     {
+        Order* order = orders.top();
+
         bool ok = order->verifStock(products);
         auto back = products.begin();
         for(auto i = products.begin(); i != products.end(); back = i, i++)
@@ -309,8 +338,8 @@ void Store::order2Operator()
 void Store::orderFinish(ostream& out)
 {
     vector<OrderOperator*> vec;
-    for(vec.push_back(operators.top()); !orders.empty(); operators.pop())
-        ;
+    for(; !orders.empty(); operators.pop())
+        vec.push_back(operators.top());
     
     out<<"Numarul de comenzi al fiecarui operator: ";
     for(auto elem : vec)
@@ -343,8 +372,8 @@ void Store::writeMostOrders()
     else
     {
         vector<OrderOperator*> vec;
-        for(vec.push_back(operators.top()); !operators.empty(); operators.pop())
-            ;
+        for(; !operators.empty(); operators.pop())
+            vec.push_back(operators.top());
         for(auto i : vec)
             operators.push(i);
     
@@ -376,8 +405,8 @@ void Store::writeMostExpensive()
     else
     {
         vector<OrderOperator*> vec;
-        for(vec.push_back(operators.top()); !operators.empty(); operators.pop())
-            ;
+        for(; !operators.empty(); operators.pop())
+            vec.push_back(operators.top());
         for(auto i : vec)
             operators.push(i);
 
@@ -407,8 +436,8 @@ void Store::writeBigSalary()
     else
     {
         vector<Employee*> vec;
-        for(vec.push_back(operators.top()); !operators.empty(); operators.pop())
-            ;
+        for(; !operators.empty(); operators.pop())
+            vec.push_back(operators.top());
         for(auto i : vec)
             operators.push(dynamic_cast<OrderOperator*>(i));
 

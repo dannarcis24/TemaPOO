@@ -1,6 +1,6 @@
 #include "Clothes.h"
 
-Clothes::Clothes(const string& name, int number1, int price, const string& culoare, const string& marca): Product(name, number1, price), color(culoare), brand(marca) 
+Clothes::Clothes(const string& name, int number1, double price, const string& culoare, const string& marca): Product(name, number1, price), color(culoare), brand(marca) 
 {
     if(color.empty())
         throw DynamicException("culoare_invalida", "!! culoarea nu poate sa fie un sir gol !!\n\n");
@@ -13,15 +13,30 @@ const double Clothes::getPrice(bool cost) const {
 }
 
 void Clothes::write(ostream& out) const{
-    out<<"Culoarea: "<<color<<"\nMarca: "<<brand<<'\n';
+    Product::write(out);
+    out<<"Tip: articol vestimentar\nCuloarea: "<<color<<"\nMarca: "<<brand<<'\n';
+}
+
+void Clothes::write(ofstream& out) const{
+    Product::write(out);
+    out<<','<<"articol vestimentar"<<','<<color<<','<<brand;
 }
 
 ostream& operator<<(ostream& out, const Clothes& elem)
 {
-    out<<"DETALII DESPRE PRODUSUL: ARTICOLE VESTIMENTARE\n";
-    elem.Product::write(out);
-    elem.write(out);
+    if(auto* aux = dynamic_cast<ofstream*>(&out))
+        elem.write(*aux);
+    else
+        elem.write(out);
+    return out;
+}
 
+ostream& operator<<(ostream& out, const Clothes* elem)
+{
+    if(auto* aux = dynamic_cast<ofstream*>(&out))
+        elem->write(*aux);
+    else
+        elem->write(out);
     return out;
 }
 
@@ -45,7 +60,7 @@ istream& operator>>(istream& in, Clothes& elem)
 {
     Clothes aux = elem;
     try{ aux.read(in);}
-    catch(const exception& e) { Product::number--; throw DynamicException(dynamic_cast<const DynamicException&>(e));}
+    catch(const exception&) { Product::number--; throw;}
     elem = aux;
 
     return in;
@@ -55,7 +70,7 @@ istream& operator>>(istream& in, Clothes* elem)
 {
     Clothes aux;
     try{ aux.read(in);}
-    catch(const exception& e) { Product::number--; throw DynamicException(dynamic_cast<const DynamicException&>(e));}
+    catch(const exception&) { Product::number--; throw;}
     *elem = aux;
 
     return in;

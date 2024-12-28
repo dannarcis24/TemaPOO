@@ -1,0 +1,33 @@
+4
+articol vestimentar
+Tricou Polo
+50
+75.5
+alb
+Ralph Lauren
+articol vestimentar
+Jeans Slim Fit
+30
+200.0
+albastru
+Levi's
+disc
+Dark Side of the Moon
+20
+150.0
+Harvest
+Pink Floyd
+The Dark Side of the Moon
+01.03.1973
+1
+disc vintage
+Sgt. Pepper's Lonely Hearts Club Band
+10
+500.0
+Parlophone
+The Beatles
+Sgt. Pepper's Lonely Hearts Club Band
+01.06.1967
+1
+5
+1

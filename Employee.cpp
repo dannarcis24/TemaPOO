@@ -1,7 +1,6 @@
 #include "Employee.h"
 
 unsigned long long Employee::number = 0;
-double Employee::coefficient = 1;
 
 void Employee::validationString(const string sir, bool tip) const
 {
@@ -105,9 +104,7 @@ void Employee::validation()
 }
 
 Employee::Employee() {
-    Employee::number++;
-    job = true;
-    coefficient = 1;
+    ID = "@" + to_string(number++);
 }
 
 Employee::Employee(const string& name1, const string& name2, const string& cod, const Date& date, bool type): last_name(name1), first_name(name2), CNP(cod), employment_date(date), job(type) {
@@ -158,13 +155,19 @@ void Employee::write(ofstream& out) const {
 
 ostream& operator<<(ostream& out, const Employee* elem) 
 {
-    elem->write(out);
+    if(auto* aux = dynamic_cast<ofstream*>(&out))
+        elem->write(*aux);
+    else
+        elem->write(out);
     return out;
 }
 
 ostream& operator<<(ostream& out, const Employee elem)
 {
-    elem.write(out);
+    if(auto* aux = dynamic_cast<ofstream*>(&out))
+        elem.write(*aux);
+    else
+        elem.write(out);
     return out;
 }
 
@@ -221,9 +224,9 @@ istream& operator>>(istream& in, Employee& elem)
     
     try {
         aux.read(in);
-        if(Employee::coefficient == 1)
-            throw DynamicException("pozitie_invalida", "!! pentru a retine un operator de comenzi, trebuie sa folositi tipul OrderOperator !!\n\n");
-    } catch(const exception& e) { Employee::number--; throw;}
+        if(elem.coefficient == 1 && typeid(elem) == typeid(Employee))
+            throw DynamicException("pozitie_invalida", "!! pentru a retine un operator de comenzi, trebuie sa folositi pozitia corespunzatoare !!\n\n");
+    } catch(const exception&) { Employee::number--; throw;}
     elem = aux;
 
     return in;
@@ -233,9 +236,9 @@ istream& operator>>(istream& in, Employee* elem)
 {  
     try {
         elem->read(in);
-        if(Employee::coefficient == 1)
-            throw DynamicException("pozitie_invalida", "!! pentru a retine un operator de comenzi, trebuie sa folositi tipul OrderOperator !!\n\n");
-    } catch(const exception& e) { Employee::number--; throw;}
+        if(elem->coefficient == 1 && typeid(*elem) == typeid(Employee))
+            throw DynamicException("pozitie_invalida", "!! pentru a retine un operator de comenzi, trebuie sa folositi pozitia corespunzatoare !!\n\n");
+    } catch(const exception&) { Employee::number--; throw;}
 
     return in;
 }

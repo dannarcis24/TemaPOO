@@ -3,7 +3,7 @@
 
 class Order {
     vector<Product*> list;
-    Date processing_date;
+    Date processing_date = Date::currentDate();
     string ID = "$0";
     int time;
 
@@ -15,11 +15,12 @@ class Order {
 
 public:
     Order();
-    Order(vector<Product>&, const Date&, int);
-    Order(vector<Product>&, const string&, int);
-    Order(vector<Product>&, int, int, int, int);
+    Order(vector<Product>&, int);
+    Order(const Order&);
 
     ~Order();
+
+    Order& operator=(const Order&);
 
     friend ostream& operator<<(ostream&, const Order&);
     friend ostream& operator<<(ostream&, const Order*);

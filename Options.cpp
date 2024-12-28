@@ -76,18 +76,20 @@ void readEmployeeFromFile(Store& m, ifstream& in)
                 elem = new OrderOperator;
             else
             {
-                cout<<("pozitie_invalida", "!! pozitia trebuie sa fie una dintre cele trei (manager/asistent/operator comenzi) !!\n\n");
+                cout<<"pozitie_invalida: !! pozitia trebuie sa fie una dintre cele trei (manager/asistent/operator comenzi) !!\n\n";
                 return;
             }
 
         try{ in>>elem;}
         catch(const exception& e) { 
             delete elem; 
-            cout<<e.what(); 
+            cout<<"Angajatul "<<i<<" (toti angajatii, care urmeaza dupa acesta nu vor putea fi adaugati): "<<e.what(); 
             return;
         }
         m.employeeAdd(elem);
     }
+
+    cout<<"Adaugarea a fost efectuata cu succes!\n\n";
 }
 
 void addEmployee(Store& m)
@@ -155,7 +157,8 @@ void writeEmployee(Store& m, bool all)
                     m.employeesWrite(out);
                 else
                     m.employeeInf(searchID(), out);
-                    
+
+                cout<<"Afisarea a fost efectuata cu succes!\n\n"; 
                 out.close();
             }
         }
@@ -173,7 +176,7 @@ void readProductFromFile(Store& m, ifstream& in)
         getline(in, option);
 
         Product* elem;
-        if(option == "artciol vestimentar")
+        if(option == "articol vestimentar")
             elem = new Clothes;
         else
             if(option == "disc")
@@ -183,18 +186,20 @@ void readProductFromFile(Store& m, ifstream& in)
                     elem = new VintageDisk;
                 else
                 {
-                    cout<<"pozitie_invalida", "!! pozitia trebuie sa fie una dintre cele trei (articol vestimentar/disc/disc vintage) !!\n\n";
+                    cout<<"pozitie_invalida: !! pozitia trebuie sa fie una dintre cele trei (articol vestimentar/disc/disc vintage) !!\n\n";
                     return;
                 }
 
         try{ in>>elem;}
         catch(const exception& e) { 
             delete elem; 
-            cout<<e.what(); 
-            continue;
+            cout<<"Produsul "<<i<<" (toate produsele, care urmeaza dupa acesta nu vor putea fi adaugate): "<<e.what(); 
+            return;
         }
         m.productAdd(elem);
     }
+
+    cout<<"Adaugarea a fost efectuata cu succes!\n\n";
 }
 
 void addProduct(Store& m)
@@ -261,7 +266,8 @@ void writeProducts(Store& m, bool all)
                 cout<<"fisier_inexistent: !! fisierul nu exista sau nu poate fi deschis !!\n\n";
             else
             {
-                (all ? m.employeesWrite(out) : m.employeeInf(searchID()), out);
+                (all ? m.productsWrite(out) : m.productInf(searchID()), out);
+                cout<<"Afisarea a fost efectuata cu succes!\n\n";
                 out.close();
             }
         }
@@ -280,9 +286,10 @@ vector<Order*> readOrders(istream& in)
         try{ in>>elem;}
         catch(const exception& e) { 
             cout<<e.what(); 
-            if(&in == &cin)
+            if(&in == &cin) {
                 i--; 
-            continue;
+                continue;
+            }
         }
 
         orders.push_back(elem);
@@ -307,8 +314,11 @@ void managementOrders(Store& m)
         {
             cout<<"Fisierul trebuie sa contina pe prima linie numarul de comenzi, pe care doriti sa le introduceti,"
                 <<"urmand ca pe fiecare linie sa fie introduse informatiile despre acestea, respectiv: "
-                <<"numarul de produse, data procesarii comenzii, ID ul comenzii si timpul de procesare\n\n"
-                <<"Introduceti numele fisierului, din care doriti sa cititi: ";
+                <<"timpul de procesare al comenzii, numarul de produse si informatiile despre fiecare produs in parte, "
+                <<"pe fiecare linie sa fie introduse informatiile despre acestea, respectiv: "
+                <<"denumirea, numarul de produse din stoc, pretul de baza si pentru fiecare tip:\nArticole vestimentare: "
+                <<"culoare, brand\nDiscuri: casa de discuri, trupa, numele albumului, data vanzarii, CD sau vinil (0/1)\n"
+                <<"Discuri vintage: raritate (1-5), mint (0/1)\n\nIntroduceti numele fisierului, din care doriti sa cititi: ";
             getline(cin, option);
 
             ifstream in(option);

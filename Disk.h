@@ -7,17 +7,20 @@ protected:
     bool type; // 0 - CD uri/ 1 - viniluri
 
     void write(ostream&) const;
+    void write(ofstream&) const;
     void read(istream&);
     bool isEqual(const Product&) const;
 
 public:
     Disk() = default;
-    Disk(const string&, int, int, const string&, const string&, const string&, const Date&, bool);
-    Disk(const string&, int, int, const string&, const string&, const string&, const string&, bool);
-    Disk(const string&, int, int, const string&, const string&, const string&, int, int, int, bool);
+    Disk(const string&, int, double, const string&, const string&, const string&, const Date&, bool);
+    Disk(const string&, int, double, const string&, const string&, const string&, const string&, bool);
+    Disk(const string&, int, double, const string&, const string&, const string&, int, int, int, bool);
 
     friend ostream& operator<<(ostream&, const Disk&);
+    friend ostream& operator<<(ostream&, const Disk*);
     friend istream& operator>>(istream&, Disk&);
+    friend istream& operator>>(istream&, Disk*);
     friend bool operator==(const Disk&, const Disk&);
     friend bool operator!=(const Disk&, const Disk&);
 

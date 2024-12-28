@@ -9,13 +9,13 @@ class OrderOperator: public Employee {
     void write(ofstream&) const;
 
 public:
-    OrderOperator() = default;
+    OrderOperator();
     OrderOperator(vector<Order>&);
 
     ~OrderOperator();
 
     friend ostream& operator<<(ostream&, const OrderOperator*);
-    friend ostream& operator<<(ostream&, const OrderOperator);
+    friend ostream& operator<<(ostream&, const OrderOperator&);
     friend istream& operator>>(istream&, OrderOperator&);
     friend istream& operator>>(istream&, OrderOperator*);
 

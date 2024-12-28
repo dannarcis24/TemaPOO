@@ -1,5 +1,14 @@
 #include "Date.h"
-#include <ctime>
+
+Date Date::currentDate() 
+{
+    time_t t = time(NULL); // se salveaza data curenta
+    tm* now = localtime(&t);
+    now->tm_mon++;// lunile sunt retinute de la 0 la 11
+    now->tm_year += 1900;// primul an este considerat 1900
+
+    return Date(*now);
+}
 
 void Date::validationDate(const string data)
 {
@@ -12,7 +21,7 @@ void Date::validationDate(const string data)
         day   = stoi(data.substr(0, 2));
         month = stoi(data.substr(3, 2));
         year   = stoi(data.substr(6, 4));
-    } catch(const exception&) { throw DynamicException("data_invalida", "!! data trebuie sa fie compusa din numere !!\n\n");}
+    } catch(const exception&) { throw DynamicException("data_invalida", "!! data trebuie sa fie compusa din numere naturale !!\n\n");}
     
     validationDate();
 }
@@ -23,40 +32,40 @@ void Date::validationDate() const
         throw DynamicException("data_invalida", "!! anul < 1900, este invalid !!\n\n");
 
     if(month <= 0 || day <= 0 || year <= 0)
-        throw DynamicException("data_invalida", "!! luna, ziua si anul trebuie sa fie numere naturale nenule !!\n\n");
+        throw DynamicException("data_invalida", "!! luna, ziua si anul trebuie sa fie numere naturale pozitive nenule !!\n\n");
 
     if(month > 12)
         throw DynamicException("data_invalida", "!! luna trebuie sa apartina intervalului 1-12 !!\n\n");
 
     if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && day > 31)
-    {
-        string text = "!! cum luna este " + to_string(month) + " ziua poate avea maxim 31zile !!\n";
-        throw DynamicException("data_invalida", text.c_str());
-    }
+        throw DynamicException("data_invalida", ("!! cum luna este " + to_string(month) + " ziua poate avea maxim 31zile !!\n"));
     else
         if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30)
-        {
-            string text = "!! cum luna este " + to_string(month) + " ziua poate avea maxim 30zile !!\n";
-            throw DynamicException("data_invalida", text.c_str());
-        }
+            throw DynamicException("data_invalida", ("!! cum luna este " + to_string(month) + " ziua poate avea maxim 30zile !!\n"));
         else
-            if(year % 4 == 0 && (year % 100 || year % 400 == 0))
-            {
-                if(day > 29) 
-                    throw DynamicException("data_invalida", "!! luna februarie in an bisect are cel mult 29zile !!\n\n");
+            if(month == 2) {
+                if(year % 4 == 0 && (year % 100 || year % 400 == 0)) {
+                    if(day > 29) 
+                        throw DynamicException("data_invalida", "!! luna februarie in an bisect are cel mult 29zile !!\n\n");
+                }
+                else
+                    if(day > 28)
+                        throw DynamicException("data_invalida", "!! luna februare in an nebisect are cel mult 28zile !!\n\n");
             }
-            else
-                if(day > 28)
-                    throw DynamicException("data_invalida", "!! luna februare in an nebisect are cel mult 28zile !!\n\n");
+
+    if(currentDate() < *this)
+        throw DynamicException("data_invalida", "!! data trebuie sa fie mai mica decat data curenta !!\n\n");
 }
 
 Date::Date(int zz, int ll, int aaaa): day(zz), month(ll), year(aaaa) {
     validationDate();
 }
 
-Date::Date(const string& data) {
-    validationDate(data);
+Date::Date(const string& date) {
+    validationDate(date);
 }
+
+Date::Date(const tm& date): day(date.tm_mday), month(date.tm_mon), year(date.tm_year) {}
 
 ostream& operator<<(ostream& out, const Date& elem)
 {
@@ -83,18 +92,46 @@ bool operator!=(const Date& elem1, const Date& elem2) {
     return !(elem1 == elem2);
 }
 
+bool operator<=(const Date& elem1, const Date& elem2) {
+    if(elem1.year < elem2.year)
+        return true;
+    else
+        if(elem1.year == elem2.year && elem1.month < elem2.month)
+            return true;
+        else
+            if(elem1.year == elem2.year && elem1.month == elem2.month && elem1.day <= elem2.day)
+                return true;
+            else
+                return false;
+}
+
+bool operator>(const Date& elem1, const Date& elem2) {
+    return !(elem1 <= elem2);
+}
+
+bool operator>=(const Date& elem1, const Date& elem2) {
+    if(elem1.year > elem2.year)
+        return true;
+    else
+        if(elem1.year == elem2.year && elem1.month > elem2.month)
+            return true;
+        else
+            if(elem1.year == elem2.year && elem1.month == elem2.month && elem1.day >= elem2.day)
+                return true;
+            else
+                return false;
+}
+
+bool operator<(const Date& elem1, const Date& elem2) {
+    return !(elem1 >= elem2);
+}
+
 bool Date::esteMajor() const
 {
-    time_t t = time(NULL); // se salveaza data curenta
-    tm* now = localtime(&t);
-    now->tm_mon++; // lunile sunt retinute de la 0 la 11
-    now->tm_year += 1900; // primul an este considerat 1900
-
-    if(now->tm_year < year)
-        throw DynamicException("data_invalida", "!! anul nasterii trebuie sa fie <" + to_string(now->tm_year) + " !!\n\n");
-
-    int age = now->tm_year - year;
-    if(month < now->tm_mon || (month == now->tm_mon && day < now->tm_mday))
+    const Date& today = currentDate();
+    
+    int age = today.year - year;
+    if(month < today.month || (month == today.month && day < today.day))
         age--;
 
     return (age >= 18);
@@ -102,22 +139,15 @@ bool Date::esteMajor() const
 
 const int Date::years() const 
 {
-    time_t t = time(NULL); // se salveaza data curenta
-    tm* now = localtime(&t);
-    now->tm_mon++; // lunile sunt retinute de la 0 la 11
-    now->tm_year += 1900; // primul an este considerat 1900
+    const Date& today = currentDate();
 
-    int years = now->tm_year - year;
-    if(month < now->tm_mon || (month == now->tm_mon && day < now->tm_mday))
+    int years = today.year - year;
+    if(month < today.month || (month == today.month && day < today.day))
         years--;
 
     return years;
 }
 
-bool Date::isBirthday() const 
-{
-    time_t t = time(NULL); // se salveaza data curenta
-    tm* now = localtime(&t);
-
-    return (++now->tm_mon == month);
+bool Date::isBirthday() const  {
+    return (currentDate().month == month);
 }

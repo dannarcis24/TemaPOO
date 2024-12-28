@@ -25,6 +25,7 @@ class Store {
 
 public:
     Store() = default;
+
     ~Store();
 
     void validation() const;
@@ -33,6 +34,7 @@ public:
      /* OPERATII CU ANGAJATI */
     //////////////////////////
     void employeeAdd(Employee*);
+    void employeeAdd(OrderOperator*);
     void employeeAdd(Employee&);
     void employeeAdd(OrderOperator&);
     Employee* employeeExist(const string&) const; // cautarea se face doar dupa ID

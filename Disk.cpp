@@ -10,15 +10,15 @@ void Disk::validation() const
         throw DynamicException("album_invalid", "!! numele albumului nu poate sa fie un sir gol !!\n\n");
 }
 
-Disk::Disk(const string& name, int number1, int price, const string& disk, const string& band1, const string& album, const Date& data, bool t): Product(name, number1, price), record_company(disk), band(band1), album_name(album), sale_date(data), type(t) {
+Disk::Disk(const string& name, int number1, double price, const string& disk, const string& band1, const string& album, const Date& data, bool t): Product(name, number1, price), record_company(disk), band(band1), album_name(album), sale_date(data), type(t) {
     validation();
 }
 
-Disk::Disk(const string& name, int number1, int price, const string& disk, const string& band1, const string& album, const string& data, bool t): Product(name, number1, price), record_company(disk), band(band1), album_name(album), sale_date(data), type(t) {
+Disk::Disk(const string& name, int number1, double price, const string& disk, const string& band1, const string& album, const string& data, bool t): Product(name, number1, price), record_company(disk), band(band1), album_name(album), sale_date(data), type(t) {
     validation();
 }
 
-Disk::Disk(const string& name, int number1, int price, const string& disk, const string& band1, const string& album, int day, int month, int year, bool t): Product(name, number1, price), record_company(disk), band(band1), album_name(album), sale_date(day, month, year), type(t) {
+Disk::Disk(const string& name, int number1, double price, const string& disk, const string& band1, const string& album, int day, int month, int year, bool t): Product(name, number1, price), record_company(disk), band(band1), album_name(album), sale_date(day, month, year), type(t) {
     validation();
 }
 
@@ -27,15 +27,30 @@ const double Disk::getPrice(bool cost) const {
 }
 
 void Disk::write(ostream& out) const {
-    out<<"Casa de Disk: "<<record_company<<"\nNumele trupei: "<<band<<"\nNumele albumului: "<<album_name<<"\nData vanzare: "<<sale_date<<'\n';
+    Product::write(out);
+    out<<"Tipul produsului: disc "<<(type ? "vinil" : "CD")<<"\nCasa de Disk: "<<record_company<<"\nNumele trupei: "<<band<<"\nNumele albumului: "<<album_name<<"\nData vanzare: "<<sale_date<<'\n';
+}
+
+void Disk::write(ofstream& out) const {
+    Product::write(out);
+    out<<','<<record_company<<','<<band<<','<<album_name<<','<<sale_date<<','<<(type ? "vinil" : "CD");
 }
 
 ostream& operator<<(ostream& out, const Disk& elem)
 {
-    out<<"DETALII DESPRE PRODUSUL: Disk\n";
-    elem.Product::write(out);
-    elem.write(out);
+    if(auto* aux = dynamic_cast<ofstream*>(&out))
+        elem.write(*aux);
+    else
+        elem.write(out);
+    return out;
+}
 
+ostream& operator<<(ostream& out, const Disk* elem)
+{
+    if(auto* aux = dynamic_cast<ofstream*>(&out))
+        elem->write(*aux);
+    else
+        elem->write(out);
     return out;
 }
 
@@ -62,6 +77,10 @@ void Disk::read(istream& in)
         throw DynamicException("album_invalid", "!! numele albumului nu poate sa fie un sir gol !!\n\n");
 
     if(&in == &cin)
+        cout<<"Data vanzarii este ";
+    in>>sale_date;
+
+    if(&in == &cin)
         cout<<"Introduceti 0 pentru CD sau 1 pentru viniluri: ";
     string aux;
     getline(in, aux);
@@ -69,19 +88,22 @@ void Disk::read(istream& in)
         throw DynamicException("argument_invalid", "!! pentru starea discului introduceti 1/0 !!\n\n");
     
     type = (aux == "0 " ? 0 : 1);
-
-    if(&in == &cin)
-        cout<<"Data vanzarii este ";
-    in>>sale_date;
 }
 
 istream& operator>>(istream& in, Disk& elem)
 {
     Disk aux = elem;
     try{ aux.read(in);}
-    catch(const exception& e) {Product::number--; throw DynamicException(dynamic_cast<const DynamicException&>(e));}
+    catch(const exception&) {Product::number--; throw;}
     elem = aux;
 
+    return in;
+}
+
+istream& operator>>(istream& in, Disk* elem)
+{
+    try{ elem->read(in);}
+    catch(const exception&) {Product::number--; throw;}
     return in;
 }
 

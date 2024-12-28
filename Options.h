@@ -22,9 +22,9 @@ void readEmployee(Store& m)
             cin>>elem;
 
             if(typeid(T) == typeid(OrderOperator) && elem->position() != "operator comenzi")
-                throw DynamicException("pozitie_invalida", "!! pentru a retine un manager sau un asistent, trebuie sa folositi tipul Employee !!\n\n");
+                throw DynamicException("pozitie_invalida", "!! pentru a retine un manager sau un asistent, trebuie sa folositi pozitia corespunzatoare !!\n\n");
             if(typeid(T) == typeid(Employee) && elem->position() == "operator comenzi")
-                throw DynamicException("pozitie_invalida", "!! pentru a retine un operator de comenzi, trebuie sa folositi tipul OrderOperator !!\n\n");
+                throw DynamicException("pozitie_invalida", "!! pentru a retine un operator de comenzi, trebuie sa folositi pozitia corespunzatoare !!\n\n");
         } catch(const exception& e) { 
             delete elem; 
             cout<<e.what(); 
@@ -34,6 +34,8 @@ void readEmployee(Store& m)
 
         m.employeeAdd(elem);
     }
+
+    cout<<"Adaugarea a fost efectuata cu succes!\n\n";
 }
 void readEmployeeFromFile(Store&, ifstream&);
 void addEmployee(Store&);
@@ -58,6 +60,8 @@ void readProduct(Store& m)
 
         m.productAdd(elem);
     }
+
+    cout<<"Adaugarea a fost efectuata cu succes!\n\n";
 }
 void readProductFromFile(Store&, ifstream&);
 void addProduct(Store&);

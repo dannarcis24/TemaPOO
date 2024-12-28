@@ -1,16 +1,16 @@
 #include "VintageDisk.h"
 
-VintageDisk::VintageDisk(const string& name, int number, int price, const string& disk, const string& band, const string& album, const Date& data, bool t,int coef, bool type): Disk(name, number, price, disk, band, album, data, t), rarity(coef), mint(type) {
+VintageDisk::VintageDisk(const string& name, int number, double price, const string& disk, const string& band, const string& album, const Date& data, bool t,int coef, bool type): Disk(name, number, price, disk, band, album, data, t), rarity(coef), mint(type) {
     if(rarity < 1 || rarity > 5)
         throw DynamicException("coeficient_raritate_invalid", "!! coeficientul de raritate al unui disc vintage este cuprins intre 1-5 !!\n\n");
 }
 
-VintageDisk::VintageDisk(const string& name, int number, int price, const string& disk, const string& band, const string& album, const string& data, bool t, int coef, bool type): Disk(name, number, price, disk, band, album, data, t), rarity(coef), mint(type) {
+VintageDisk::VintageDisk(const string& name, int number, double price, const string& disk, const string& band, const string& album, const string& data, bool t, int coef, bool type): Disk(name, number, price, disk, band, album, data, t), rarity(coef), mint(type) {
     if(rarity < 1 || rarity > 5)
         throw DynamicException("coeficient_raritate_invalid", "!! coeficientul de raritate al unui disc vintage este cuprins intre 1-5 !!\n\n");
 }
 
-VintageDisk::VintageDisk(const string& name, int number, int price, const string& disk, const string& band, const string& album, int day, int month, int year, bool t, int coef, bool type):Disk(name, number, price, disk, band, album, day, month, year, t), rarity(coef), mint(type) {
+VintageDisk::VintageDisk(const string& name, int number, double price, const string& disk, const string& band, const string& album, int day, int month, int year, bool t, int coef, bool type):Disk(name, number, price, disk, band, album, day, month, year, t), rarity(coef), mint(type) {
     if(rarity < 1 || rarity > 5)
         throw DynamicException("coeficient_raritate_invalid", "!! coeficientul de raritate al unui disc vintage este cuprins intre 1-5 !!\n\n");
 }
@@ -26,20 +26,36 @@ const double VintageDisk::getPrice(bool cost) const {
 
 void VintageDisk::write(ostream& out) const {
     Disk::write(out);
-    out<<"Coeficientul de raritate: "<<rarity<<"\nStarea discului: "<<(mint ? "neutilizat" : "utilizat")<<'\n';
+    out<<"Coeficientul de raritate: "<<rarity<<"\nStarea discului vintage: "<<(mint ? "neutilizat" : "utilizat")<<'\n';
+}
+
+void VintageDisk::write(ofstream& out) const {
+    Disk::write(out);
+    out<<','<<rarity<<','<<(mint ? "neutilizat" : "utilizat");
 }
 
 ostream& operator<<(ostream& out, const VintageDisk& elem)
 {
-    out<<"DETALII DESPRE PRODUSUL: VintageDisk\n";
-    elem.Disk::write(out);
-    elem.write(out);
+    if(auto* aux = dynamic_cast<ofstream*>(&out))
+        elem.write(*aux);
+    else
+        elem.write(out);
+    return out;
+}
 
+ostream& operator<<(ostream& out, const VintageDisk* elem)
+{
+    if(auto* aux = dynamic_cast<ofstream*>(&out))
+        elem->write(*aux);
+    else
+        elem->write(out);
     return out;
 }
 
 void VintageDisk::read(istream& in)
 {
+    Disk::read(in);
+    
     if(&in == &cin)
         cout<<"Coeficientul de raritate este: ";
     string aux;
@@ -63,9 +79,16 @@ istream& operator>>(istream& in, VintageDisk& elem)
 {
     VintageDisk aux = elem;
     try { aux.read(in);}
-    catch(const exception& e) { Product::number--; throw DynamicException(dynamic_cast<const DynamicException&>(e));}
+    catch(const exception&) { Product::number--; throw;}
     elem = aux;
 
+    return in;
+}
+
+istream& operator>>(istream& in, VintageDisk* elem)
+{
+    try{ elem->read(in);}
+    catch(const exception&) { Product::number--; throw;}
     return in;
 }
 

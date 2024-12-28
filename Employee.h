@@ -1,16 +1,16 @@
 #include "Date.h"
 #include <fstream>
+#include <typeinfo>
 
 class Employee {
-    static unsigned long long number;
-    bool job = true; // assistent(true) or manager(false)
-
 protected:
     string last_name, first_name, CNP, ID = "@0";
     Date employment_date = Date();
+    double coefficient;
+    bool job = true; // assistent(true) or manager(false)
 
     static const int salary_base = 3500, old = 100;
-    static double coefficient;
+    static unsigned long long number;
 
     virtual void write(ostream&) const;
     virtual void write(ofstream&) const;

@@ -110,7 +110,7 @@ inline void Option4(Store& m, bool& exit) {
     {
         system("cls");
          cout<<"     ROCK the SHOP\nGENEREAREA RAPOARTELOR\n 1. Angajatul cu cele mai multe comenzi procesate\n"
-            <<"2. TOP 3angajati, care au gestionat cele mai valoroase comenzi\n3. TOP 3angajati, care au cel mai mare salariu in luna curenta\n"
+            <<" 2. TOP 3angajati, care au gestionat cele mai valoroase comenzi\n 3. TOP 3angajati, care au cel mai mare salariu in luna curenta\n"
             <<" 4. Inapoi\n 5. Iesire\n\nOptiunea dvs. este: ";
 
         string option;
@@ -191,3 +191,4 @@ int main()
         }
     }
 }
+

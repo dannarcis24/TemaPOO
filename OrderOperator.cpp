@@ -10,6 +10,11 @@ OrderOperator::OrderOperator(vector<Order>& vec)
             orders.push_back(&(*i));
 }
 
+OrderOperator::OrderOperator() {
+    coefficient = 1;
+    job = true;
+}
+
 OrderOperator::~OrderOperator()
 {
     for(auto& i : orders)
@@ -51,27 +56,35 @@ void OrderOperator::write(ostream& out) const
 }
 
 void OrderOperator::write(ofstream& out) const {
+    Employee::write(out);
     out<<','<<total_orders<<','<<bonus;
 }
 
 ostream& operator<<(ostream& out, const OrderOperator* elem) 
 {
-    elem->write(out);
+    if(auto* aux = dynamic_cast<ofstream*>(&out))
+        elem->write(*aux);
+    else
+        elem->write(out);
     return out;
 }
 
-ostream& operator<<(ostream& out, const OrderOperator elem)
+ostream& operator<<(ostream& out, const OrderOperator& elem)
 {
-    elem.write(out);
+    if(auto* aux = dynamic_cast<ofstream*>(&out))
+        elem.write(*aux);
+    else
+        elem.write(out);
     return out;
 }
 
 istream& operator>>(istream& in, OrderOperator& elem)
 {
     OrderOperator aux;
-    aux.read(in);
-    if(Employee::coefficient != 1)
-        throw DynamicException("pozitie_invalida", "!! pentru a retine un manager sau asistent trebuie sa folositi tipul Employee !!\n\n");
+    try{ aux.read(in);
+        if(elem.coefficient != 1)
+            throw DynamicException("pozitie_invalida", "!! pentru a retine un manager sau asistent trebuie sa folositi tipul Employee !!\n\n");
+    } catch(const exception&) { Employee::number--; throw;}
     elem = aux;
 
     return in;

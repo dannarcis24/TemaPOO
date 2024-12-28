@@ -34,24 +34,45 @@ void Order::validation(vector<Product>& vec)
 }
 
 Order::Order() {
-    Order::number++;
+    ID = "$" + to_string(Order::number++);
 }
 
-Order::Order(vector<Product>& vec, const Date& date, int t): processing_date(date), time(t) {
+Order::Order(vector<Product>& vec, int t): time(t) {
     validation(vec);
 }
 
-Order::Order(vector<Product>& vec, const string& date, int t): processing_date(date), time(t) {
-    validation(vec);
-}
-
-Order::Order(vector<Product>& vec, int day, int month, int year, int t): processing_date(day, month, year), time(t) {
-    validation(vec);
+Order::Order(const Order& elem): time(elem.time), processing_date(elem.processing_date), list(elem.list) {
+    ID = "$" + to_string(Order::number++);
 }
 
 Order::~Order() {
-    for(auto& i : list)
+    for(auto i : list)
         delete i;
+}
+
+Order& Order::operator=(const Order& elem)
+{
+    time = elem.time;
+    processing_date = elem.processing_date;
+    
+    for(auto i : list)
+        delete i;
+    for(auto i : elem.list)
+    {
+        Product* elem;
+        if(typeid(*i) == typeid(Clothes))
+            elem = new Clothes;
+        else
+            if(typeid(*i) == typeid(Disk))
+                elem = new Disk;
+            else
+                elem = new VintageDisk;
+        
+        *elem = *i;
+        list.push_back(elem);
+    }
+
+    return *this;
 }
 
 void Order::write(ostream& out) const
@@ -80,10 +101,6 @@ ostream& operator<<(ostream& out, const Order* elem)
 
 void Order::read(istream& in)
 {
-    if(&in == &cin)
-        cout<<"Data de procesare este: ";
-    in>>processing_date;
-
     if(&in == &cin)
         cout<<"Durata pentru finalizarea comenzii este: ";
     string aux;
