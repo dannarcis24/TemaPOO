@@ -9,13 +9,13 @@ class Order {
 
     static long long number;
 
-    inline void validation(vector<Product>&);
+    inline void validation(vector<Product*>&);
     inline void write(ostream&) const;
     inline void read(istream&);
 
 public:
     Order();
-    Order(vector<Product>&, int);
+    Order(vector<Product*>&, int);
     Order(const Order&);
 
     ~Order();
@@ -28,6 +28,6 @@ public:
     friend istream& operator>>(istream&, Order*);
 
     const int getTime(bool = true);
-    const int getPrice() const;
+    const double getPrice() const;
     bool verifStock(vector<Product*>) const;
 };

@@ -17,8 +17,6 @@ int number()
 
             return nr;
         } catch(const exception& e) { cout<<e.what();}
-
-        cout<<"Daca doriti sa renuntati la a adauga, introduceti 0 la urmatorul pas.\n";
     }
 }
 
@@ -285,16 +283,25 @@ vector<Order*> readOrders(istream& in)
         Order* elem = new Order; 
         try{ in>>elem;}
         catch(const exception& e) { 
-            cout<<e.what(); 
-            if(&in == &cin) {
+            delete elem;
+
+            if(&in == &cin) 
+            {
+                cout<<e.what(); 
                 i--; 
                 continue;
+            }
+            else
+            {
+                cout<<"Comanda "<<i<<" (toate comemzile, care urmeaza dupa acesta nu vor putea fi adaugate): "<<e.what(); 
+                return orders;
             }
         }
 
         orders.push_back(elem);
     }
 
+    cout<<"Adaugarea a fost efectuata cu succes!\n\n";
     return orders;
 }
 
@@ -333,15 +340,19 @@ void managementOrders(Store& m)
         else
             cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele doua: tastatura/fisier !!\n\n";
 
+    bool exist = true;
     for(register int i = 0; m.orderExist(); i++)
     {
         try{ m.validation();}
         catch(const exception& e) {cout<<e.what(); m.ordersDel(); return;}
 
-        try{ m.order2Operator();}
-        catch(const exception& e) { cout<<e.what();}
+        cout<<"\nMomentul de timp "<<(i + 1)<<":\n";
+        if(exist)
+            try{ m.order2Operator();}
+            catch(const exception& e) { exist = false; cout<<e.what();}
         
         m.orderFinish();
-        cout<<"Momentul de timp "<<(i + 1)<<":\nMai sunt "<<m.orderNumber()<<" comenzi de procesat, acestea se afla in lista de asteptare.\n\n";
+        if(m.orderNumber())
+            cout<<":\nMai sunt "<<m.orderNumber()<<" comenzi de procesat, acestea se afla in lista de asteptare.\n\n";
     }
 }

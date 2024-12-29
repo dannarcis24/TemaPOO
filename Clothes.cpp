@@ -44,13 +44,13 @@ void Clothes::read(istream& in)
 {
     Product::read(in);
     if(&in == &cin)
-        cout<<"Culoarea este: ";
+        cout<<"Introduceti culoarea: ";
     getline(in, color);
     if(color.empty())
         throw DynamicException("culoare_invalida", "!! culoarea nu poate sa fie un sir gol !!\n\n");
 
     if(&in == &cin)
-        cout<<"Marca este: ";
+        cout<<"Introduceti marca: ";
     getline(in, brand);
     if(brand.empty())
         throw DynamicException("marca_invalida", "!! marca nu poate sa fie un sir gol!!\n\n");

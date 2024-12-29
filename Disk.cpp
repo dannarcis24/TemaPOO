@@ -59,25 +59,25 @@ void Disk::read(istream& in)
     Product::read(in);
 
     if(&in == &cin)
-        cout<<"Numele casei de Diskuri este: ";
+        cout<<"Introduceti casa de discuri: ";
     getline(in, record_company);
     if(record_company.empty())
-        throw DynamicException("casa_Disk_invalida", "!! casa de Disk nu poate sa fie un sir gol !!\n\n");
+        throw DynamicException("casa_disc_invalida", "!! casa de disc nu poate sa fie un sir gol !!\n\n");
 
     if(&in == &cin)
-        cout<<"Numele trupei este: ";
+        cout<<"Introduceti numele trupei: ";
     getline(in, band);
     if(band.empty())
         throw DynamicException("trupa_invalida", "!! numele trupei nu poate sa fie un sir gol !!\n\n");
 
     if(&in == &cin)
-        cout<<"Numele albumului este: ";
+        cout<<"Introduceti numele albumului: ";
     getline(in, album_name);
     if(album_name.empty())
         throw DynamicException("album_invalid", "!! numele albumului nu poate sa fie un sir gol !!\n\n");
 
     if(&in == &cin)
-        cout<<"Data vanzarii este ";
+        cout<<"Introduceti data vanzarii ";
     in>>sale_date;
 
     if(&in == &cin)

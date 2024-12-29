@@ -43,13 +43,13 @@ ostream& operator<<(ostream& out, const Product* elem)
 void Product::read(istream& in)
 {
     if(&in == &cin)
-        cout<<"Denumirea produsului: ";
+        cout<<"Introduceti denumirea: ";
     getline(in, name);
     if(name.empty())
         throw DynamicException("denumire_invalida", "!! denumirea unui product nu poate fi un sir gol !!\n\n");
 
     if(&in == &cin)
-        cout<<"Numarul de produse: ";
+        cout<<"Introduceti numarul de produse: ";
     string aux;
     getline(in, aux);
     try{ number_products = stoi(aux);
@@ -58,7 +58,7 @@ void Product::read(istream& in)
     catch(const exception&) { throw;}
 
     if(&in == &cin)
-        cout<<"Pretul de baza: ";
+        cout<<"Introduceti pretul de baza: ";
     getline(in, aux);
     try{ price_base = stoi(aux);
         if(price_base <= 0)

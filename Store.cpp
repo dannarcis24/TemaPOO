@@ -24,28 +24,26 @@ void Store::validationEmployees() const
     
     if(operators.size() < 3)
         throw DynamicException("magazin_nefunctional", "!! magazinul nu poate functiona fara sa aiba minim 3operatori de comenzi !!\n\n");
-    
-    if(products.size() < 6)
-        throw DynamicException("magazin_nefunctional", "!! magazinul trebuie sa aiba cel putin cate 2produse din fiecare tip !!\n\n");
 }
 
 void Store::validationProducts() const
 {
     vector<int> number = vector<int>(3, 0);
-    for(auto& i : products)
+    for(auto i : products)
     {
-        if(typeid(i) == typeid(Clothes))
+        if(typeid(*i) == typeid(Clothes))
             number[0] += i->getNumber();
         else
-            if(typeid(i) == typeid(Disk))
+            if(typeid(*i) == typeid(Disk))
                 number[1] += i->getNumber();
             else
                 number[2] += i->getNumber();
         
-        if(count_if(number.begin(), number.end(), [](bool x) { return (x >= 2); }) == 3)
+        if(count_if(number.begin(), number.end(), [](int x) { return (x >= 2); }) == 3)
             break;
     }
-    if(any_of(number.begin(), number.end(), [](bool x) { return (x < 2); }))
+
+    if(any_of(number.begin(), number.end(), [](int x) { return (x < 2); }))
         throw DynamicException("magazin_nefunctional", "!! magazinul trebuie sa aiba cel putin cate 2produse din fiecare tip !!\n\n");
 }
 
@@ -293,40 +291,54 @@ void Store::orderAdd(const vector<Order*>& elem) {
         orders.push(i);
 }
 
-bool Store::orderExist() const {
-    return (!orders.empty() || (operators.top())->ordersNumber());
+bool Store::orderExist() {
+    if(orders.empty())
+    {
+        vector<OrderOperator*> vec;
+        for(; !operators.empty(); operators.pop())
+            vec.push_back(new OrderOperator(*(operators.top())));
+        int nr = count_if(vec.begin(), vec.end(), [](OrderOperator* elem) {return (elem->ordersNumber() != 0);});
+
+        for(auto i : vec)
+            operators.push(i);
+        vec.clear();
+
+        return (nr > 0);
+    }
+    else
+        return true;
 }
 
 int Store::orderNumber() 
 {
     vector<Order*> vec;
 
-    for(vec.push_back(orders.top()); !orders.empty(); orders.pop())
-        ;
+    for(; !orders.empty(); orders.pop())
+        vec.push_back(new Order(*(orders.top())));
     orderAdd(vec);
 
-    return vec.size();
+    int nr = vec.size();
+    for(auto i : vec)
+        delete i;
+    vec.clear();
+
+    return nr;
 }
 
 void Store::order2Operator()
 {
     if(orders.empty())
-        throw DynamicException("comanda_inexistenta", "!! nu mai exista comenzi d procesat !!\n\n");
+        throw DynamicException("comanda_inexistenta", "!! nu mai exista comenzi de procesat !!\n");
 
-    for(; !orders.empty() && (operators.top())->ordersNumber() < 4; orders.pop())
+    for(; !orders.empty() && (operators.top())->ordersNumber() < 3; orders.pop())
     {
-        Order* order = orders.top();
+        Order* order = new Order(*(orders.top()));
+        cout<<"Comanda a fost asignata unui operator de comenzi\n"<<order;
 
         bool ok = order->verifStock(products);
-        auto back = products.begin();
-        for(auto i = products.begin(); i != products.end(); back = i, i++)
-            if((*i)->getNumber() == 0)
-            {
-                products.erase(i);
-                i = back;
-            }
+        products.erase(remove_if(products.begin(), products.end(), [](const Product* elem) { return (elem->getNumber() == 0);}), products.end());
 
-        OrderOperator* aux = operators.top();
+        OrderOperator* aux = new OrderOperator(*(operators.top()));
         aux->orderAdd(order);
         operators.pop();
         operators.push(aux);
@@ -338,18 +350,32 @@ void Store::order2Operator()
 void Store::orderFinish(ostream& out)
 {
     vector<OrderOperator*> vec;
-    for(; !orders.empty(); operators.pop())
-        vec.push_back(operators.top());
+    for(; !operators.empty(); operators.pop())
+        vec.push_back(new OrderOperator(*(operators.top())));
     
     out<<"Numarul de comenzi al fiecarui operator: ";
+    vector<Order*> finish;
     for(auto elem : vec)
     {
-        elem->orderFinish();
+        vector<Order*> aux = elem->orderFinish();
+        if(!aux.empty())
+            finish.insert(finish.end(), aux.begin(), aux.end());
         operators.push(elem);
 
         out<<elem->ordersNumber()<<' ';
     }
     out<<'\n';
+
+    if(!finish.empty())
+    {
+        cout<<"Comenzi finalizate:\n";
+        for(auto i : finish)
+        {
+            cout<<1<<'\n';
+            delete i;
+        }
+        finish.clear();
+    }
 }
 
 void Store::ordersDel() {
@@ -373,12 +399,12 @@ void Store::writeMostOrders()
     {
         vector<OrderOperator*> vec;
         for(; !operators.empty(); operators.pop())
-            vec.push_back(operators.top());
+            vec.push_back(new OrderOperator(*(operators.top())));
         for(auto i : vec)
             operators.push(i);
     
-        vector<OrderOperator*>::iterator ma = max(vec.begin(), vec.end(), 
-                [](vector<OrderOperator*>::iterator elem1, vector<OrderOperator*>::iterator elem2) { return ((*elem1)->allOrders() > (*elem2)->allOrders());});
+        vector<OrderOperator*>::iterator ma = max_element(vec.begin(), vec.end(), 
+                [](OrderOperator* elem1, OrderOperator* elem2) { return (elem1->allOrders() < elem2->allOrders());});
         if((*ma)->allOrders() == 0)
             cout<<"raport_invalid: !! nu s-a realizat nici o procesare de comenzi !!\n\n";
         else
@@ -387,6 +413,7 @@ void Store::writeMostOrders()
             cout<<"Raportul a fost creat cu succes!";
         }
         
+        vec.clear();
         out.close();
     }
 }
@@ -406,7 +433,7 @@ void Store::writeMostExpensive()
     {
         vector<OrderOperator*> vec;
         for(; !operators.empty(); operators.pop())
-            vec.push_back(operators.top());
+            vec.push_back(new OrderOperator(*(operators.top())));
         for(auto i : vec)
             operators.push(i);
 
@@ -418,6 +445,7 @@ void Store::writeMostExpensive()
             out<<vec[0]<<'\n'<<vec[1]<<'\n'<<vec[2];
         }
         
+        vec.clear();
         out.close();
     }
 }
@@ -437,7 +465,7 @@ void Store::writeBigSalary()
     {
         vector<Employee*> vec;
         for(; !operators.empty(); operators.pop())
-            vec.push_back(operators.top());
+            vec.push_back(new OrderOperator(*(operators.top())));
         for(auto i : vec)
             operators.push(dynamic_cast<OrderOperator*>(i));
 
@@ -446,6 +474,8 @@ void Store::writeBigSalary()
         sort(vec.begin(), vec.begin() + 3, [](const Employee* elem1, const Employee* elem2) { return compareByName(elem1, elem2);});
 
         out<<vec[0]<<'\n'<<vec[1]<<'\n'<<vec[2];
+        
+        vec.clear();
         out.close();
         cout<<"Raportul a fost creat cu succes!";
     }

@@ -11,8 +11,11 @@ class OrderOperator: public Employee {
 public:
     OrderOperator();
     OrderOperator(vector<Order>&);
+    OrderOperator(const OrderOperator&);
 
     ~OrderOperator();
+
+    OrderOperator& operator=(const OrderOperator&);
 
     friend ostream& operator<<(ostream&, const OrderOperator*);
     friend ostream& operator<<(ostream&, const OrderOperator&);
@@ -22,7 +25,7 @@ public:
     const int salary() const;
     
     void orderAdd(Order*);
-    void orderFinish();
+    vector<Order*> orderFinish();
     const int ordersNumber() const;
     const int allOrders() const;
     double bonus4Orders() const;

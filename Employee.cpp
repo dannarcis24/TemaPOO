@@ -134,7 +134,7 @@ Employee::Employee(const string& position)
 }
 
 const int Employee::salary() const {
-    return ((salary_base + old * employment_date.years()) * coefficient + (job && birthday().isBirthday() ? 100 : 0));
+    return ((salary_base + old * employment_date.years()) * (job == false ? 1.75 : (position() == "asistent" ? 0.75 : 1)) + (job && birthday().isBirthday() ? 100 : 0));
 }
 
 void Employee::setName(const string& sir)

@@ -60,7 +60,7 @@ public:
      /* OPERATII CU COMENZI */
     /////////////////////////
     void orderAdd(const vector<Order*>&);
-    bool orderExist() const;
+    bool orderExist();
     int orderNumber();
     void order2Operator();
     void orderFinish(ostream& = cout);

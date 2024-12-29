@@ -2,15 +2,15 @@
 
 long long Order::number = 0;
 
-void Order::validation(vector<Product>& vec) 
+void Order::validation(vector<Product*>& vec) 
 {
     if(vec.empty())
         throw DynamicException("comanda_invalida", "!! o comanda trebuie sa aiba cel putin un produs !!\n\n");
 
     int disks = 0, clothes = 0, price = 0;
-    for(auto i = vec.begin(); i != vec.end(); i++)
+    for(auto i : vec)
     {
-        if(typeid(*i) == typeid(Clothes())) 
+        if(typeid(*i) == typeid(Clothes)) 
         {
             clothes += i->getNumber();
             if(clothes > 3)
@@ -23,53 +23,68 @@ void Order::validation(vector<Product>& vec)
                     throw DynamicException("comanda_invalida", "!! o comanda poate sa contina maxim 5discuri si 3artcole vestimentare !!\n\n");
             }
         
-        price += i->getPrice(false);
+        price += i->getPrice(false) * i->getNumber();
 
-        list.push_back(&(*i));
+        list.push_back(i);
     }
     if(price < 100)
-        throw DynamicException("comanda_invalida", "!! o comanda trebuie sa aiba pretul minim de 100lei, fara costuri suplimentare !!\n\n");   
-
-    ID = "$" + to_string(Order::number++);     
+        throw DynamicException("comanda_invalida", "!! o comanda trebuie sa aiba pretul minim de 100lei, fara costuri suplimentare !!\n\n");      
 }
 
 Order::Order() {
     ID = "$" + to_string(Order::number++);
 }
 
-Order::Order(vector<Product>& vec, int t): time(t) {
+Order::Order(vector<Product*>& vec, int t): time(t) {
     validation(vec);
+    ID = "$" + to_string(Order::number++);
 }
 
-Order::Order(const Order& elem): time(elem.time), processing_date(elem.processing_date), list(elem.list) {
-    ID = "$" + to_string(Order::number++);
+Order::Order(const Order& elem): ID(elem.ID), time(elem.time), processing_date(elem.processing_date), list(elem.list) {
+    for(auto i : elem.list)
+    {
+        Product* aux;
+        if(typeid(*i) == typeid(Clothes))
+            aux = new Clothes;
+        else
+            if(typeid(*i) == typeid(Disk))
+                aux = new Disk;
+            else
+                aux = new VintageDisk;
+        
+        *aux = *i;
+        list.push_back(aux);
+    }
 }
 
 Order::~Order() {
     for(auto i : list)
         delete i;
+    list.clear();
 }
 
 Order& Order::operator=(const Order& elem)
 {
+    ID = elem.ID;
     time = elem.time;
     processing_date = elem.processing_date;
     
     for(auto i : list)
         delete i;
+    list.clear();
     for(auto i : elem.list)
     {
-        Product* elem;
+        Product* aux;
         if(typeid(*i) == typeid(Clothes))
-            elem = new Clothes;
+            aux = new Clothes;
         else
             if(typeid(*i) == typeid(Disk))
-                elem = new Disk;
+                aux = new Disk;
             else
-                elem = new VintageDisk;
+                aux = new VintageDisk;
         
-        *elem = *i;
-        list.push_back(elem);
+        *aux = *i;
+        list.push_back(aux);
     }
 
     return *this;
@@ -115,43 +130,47 @@ void Order::read(istream& in)
     try{ nr = stoi(aux);}
     catch(const exception&) { throw DynamicException("numar_invalid", "!! numarul de produse trebuie sa fie un numar natural pozitiv nenul !!\n\n");}
 
-    for(register int i = 0; i < nr; i++)
-    {
-        if(&cin == &in)
-            cout<<"Introduceti tipul produsului " + to_string(i + 1) + " (articol vestimentar/disc/disc vintage): ";
-        getline(in, aux);
-        
-        Product* elem;
-        if(aux == "articol vestimentar")
+    try {
+        vector<Product*> vec;
+        for(register int i = 0; i < nr; i++)
         {
-            Product* elem = new Clothes;
-            in>>elem;
-            list.push_back(elem);
-        }
-        else
-            if(aux == "disc")
-                {
-                    elem = new Disk;
-                    in>>elem;
-                    list.push_back(elem);
-                }
+            if(&cin == &in)
+                cout<<"Introduceti tipul produsului " + to_string(i + 1) + " (articol vestimentar/disc/disc vintage): ";
+            getline(in, aux);
+            
+            Product* elem;
+            if(aux == "articol vestimentar")
+            {
+                Product* elem = new Clothes;
+                in>>elem;
+                vec.push_back(elem);
+            }
             else
-                if(aux == "disc vintage")
-                {
-                    elem = new VintageDisk;
-                    in>>elem;
-                    list.push_back(elem);
-                }
+                if(aux == "disc")
+                    {
+                        elem = new Disk;
+                        in>>elem;
+                        vec.push_back(elem);
+                    }
                 else
-                    throw DynamicException("produs_invalid", "!! produsul trebuie sa fie unul dintre cele trei: articol vestimentar/disc/disc vintage !!\n\n");
-    }
+                    if(aux == "disc vintage")
+                    {
+                        elem = new VintageDisk;
+                        in>>elem;
+                        vec.push_back(elem);
+                    }
+                    else
+                        throw DynamicException("produs_invalid", "!! produsul trebuie sa fie unul dintre cele trei: articol vestimentar/disc/disc vintage !!\n\n");
+        }
+        validation(vec);
+    } catch(const exception&) { throw;}
 }
 
 istream& operator>>(istream& in, Order& elem)
 {
     Order aux;
     try{ aux.read(in);}
-    catch(const exception& e) { throw DynamicException(dynamic_cast<const DynamicException&>(e));}
+    catch(const exception&) { Order::number--; throw;}
     elem = aux;
 
     return in;
@@ -160,7 +179,7 @@ istream& operator>>(istream& in, Order& elem)
 istream& operator>>(istream& in, Order* elem)
 {
     try{ elem->read(in);}
-    catch(const exception& e) { throw DynamicException(dynamic_cast<const DynamicException&>(e));}
+    catch(const exception&) { Order::number--; throw;}
 
     return in;
 }
@@ -169,11 +188,11 @@ const int Order::getTime(bool type) {
     return (type ? --time : time);
 }
 
-const int Order::getPrice() const
+const double Order::getPrice() const
 {
     int sum = (*(list.begin()))->getPrice();
     for(auto i = ++list.begin(); i != list.end(); i++)
-        sum += (*i)->getPrice();
+        sum += (*i)->getPrice() + (*i)->getNumber();
 
     return sum;
 }

@@ -15,10 +15,31 @@ OrderOperator::OrderOperator() {
     job = true;
 }
 
+OrderOperator::OrderOperator(const OrderOperator& elem): Employee(elem), bonus(elem.bonus), total_orders(elem.total_orders) {
+    for(auto i : elem.orders)
+        orders.push_back(new Order(*i));
+}
+
 OrderOperator::~OrderOperator()
 {
     for(auto& i : orders)
         delete i;
+    orders.clear();
+}
+
+OrderOperator& OrderOperator::operator=(const OrderOperator& elem)
+{
+    Employee::operator=(elem);
+    bonus = elem.bonus;
+    total_orders = elem.total_orders;
+
+    for(auto i : orders)
+        delete i;
+    orders.clear();
+    for(auto i : elem.orders)
+        orders.push_back(new Order(*i));
+
+    return *this;
 }
 
 const int OrderOperator::salary() const {
@@ -30,12 +51,13 @@ void OrderOperator::orderAdd(Order* elem)
     if(orders.size() == 3)
         throw DynamicException("cerere_invalida", "!! un operator de comenzi nu poate gestiona mai mult de 3comenzi in paralel !!\n\n");
     
-    orders.push_back(elem);
+    orders.push_back(new Order(*elem));
 }
 
-void OrderOperator::orderFinish()
+vector<Order*> OrderOperator::orderFinish()
 {
-    if(orders.empty())  return;
+    vector<Order*> vec;
+    if(orders.empty())  return vec;
 
     for(auto i = orders.begin(); i != orders.end();)
         if((*i)->getTime() == 0)
@@ -43,10 +65,13 @@ void OrderOperator::orderFinish()
             total_orders++;
             bonus += 0.005 * (*i)->getPrice();
 
-            orders.erase(i);
+            vec.push_back(new Order(*(*i)));
+            i = orders.erase(i);
         }
         else
             i++;
+
+    return vec;
 }
 
 void OrderOperator::write(ostream& out) const

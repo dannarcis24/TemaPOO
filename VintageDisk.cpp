@@ -57,7 +57,7 @@ void VintageDisk::read(istream& in)
     Disk::read(in);
     
     if(&in == &cin)
-        cout<<"Coeficientul de raritate este: ";
+        cout<<"Introduceti coeficientul de raritate: ";
     string aux;
     getline(in, aux);
     try{ 

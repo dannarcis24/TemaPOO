@@ -2,7 +2,6 @@
 #include <windows.h>
 
 inline void wait() {
-
     cout<<"Apasati ENTER pentru a continua...";
     cin.get();
 }
@@ -19,6 +18,9 @@ inline void Option1(Store& m, bool& exit) {
         getline(cin, option);
 
         try {
+            if(option.size() != 1)
+                throw invalid_argument("optiune invalida\n");
+            
             switch(stoi(option)) {
                 case 1: {
                     addEmployee(m);
@@ -27,10 +29,13 @@ inline void Option1(Store& m, bool& exit) {
                 case 2: {
                     try{ m.employeeDel(searchID());}
                     catch(const exception& e) { cout<<e.what();}
+                    cout<<"Stergerea a fost efectuata cu succes!\n\n";
                     break;
                 }
                 case 3: {
-                    m.employeeSet(searchID(), name());
+                    try{ m.employeeSet(searchID(), name());}
+                    catch(const exception& e) { cout<<e.what();}
+                    cout<<"Modificarea a fost efectuata cu succes!\n\n";
                     break;
                 }
                 case 4: {
@@ -48,9 +53,9 @@ inline void Option1(Store& m, bool& exit) {
                     exit = true;
                     return;
                 }
-                default: cout<<"optiune invalida\n";
+                default: throw invalid_argument("optiune invalida\n");
             }
-        } catch(const exception&) { cout<<"optiune invalida\n";}
+        } catch(const exception& e) { cout<<e.what();}
 
         wait();
     }
@@ -68,6 +73,9 @@ inline void Option2(Store& m, bool& exit) {
         getline(cin, option);;
 
         try {
+            if(option.size() != 1)
+                throw invalid_argument("optiune invalida\n");
+            
             switch(stoi(option)) {
                 case 1: {
                     addProduct(m);
@@ -76,10 +84,13 @@ inline void Option2(Store& m, bool& exit) {
                 case 2: {
                     try{ m.productDel(searchID());}
                     catch(const exception& e) { cout<<e.what();}
+                    cout<<"Stergerea a fost efectuata cu succes!\n\n";
                     break;
                 }
                 case 3: {
-                    m.productSet(searchID(), number());
+                    try{ m.productSet(searchID(), number());}
+                    catch(const exception& e) { cout<<e.what();}
+                    cout<<"Modificarea a fost efectuata cu succes!\n\n";
                     break;
                 }
                 case 4: {
@@ -97,9 +108,9 @@ inline void Option2(Store& m, bool& exit) {
                     exit = true;
                     return;
                 }
-                default: cout<<"optiune invalida\n";
+                default: throw invalid_argument("optiune invalida\n");
             }
-        } catch(const exception& e) { cout<<"optiune invalida\n";}
+        } catch(const exception& e) { cout<<e.what();}
 
         wait();
     }
@@ -117,6 +128,9 @@ inline void Option4(Store& m, bool& exit) {
         getline(cin, option);;
 
         try {
+            if(option.size() != 1)
+                throw invalid_argument("optiune invalida\n");
+            
             switch(stoi(option)) {
                 case 1: {
                     m.writeMostOrders();
@@ -135,9 +149,9 @@ inline void Option4(Store& m, bool& exit) {
                     exit = true;
                     return;
                 }
-                default: cout<<"optiune invalida\n";
+                default: throw invalid_argument("optiune invalida\n");
             }
-        } catch(const exception& e) { cout<<"optiune invalida\n";}
+        } catch(const exception& e) { cout<<e.what();}
 
         wait();
     }
@@ -158,6 +172,9 @@ int main()
 
         bool exit = false;
         try {
+            if(option.size() != 1)
+                throw invalid_argument("optiune invalida\n");
+            
             switch(stoi(option)) {
                 case 1: {
                     Option1(m, exit);
@@ -180,9 +197,9 @@ int main()
                     exit = true;
                     break;
                 }
-                default: {cout<<"optiune invalida\n"; wait();}
+                default: throw invalid_argument("optiune invalida\n");
             }
-        } catch(const exception&) { cout<<"optiune invalida\n"; wait();}
+        } catch(const exception& e) { cout<<e.what(); wait();}
 
         if(exit)
         {
@@ -191,4 +208,3 @@ int main()
         }
     }
 }
-
