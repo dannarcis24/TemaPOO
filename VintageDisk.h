@@ -17,9 +17,9 @@ public:
     VintageDisk(const Disk, int, bool);
 
     friend ostream& operator<<(ostream&, const VintageDisk&);
-    friend ostream& operator<<(ostream&, const VintageDisk*);
+    friend ostream& operator<<(ostream&, const unique_ptr<VintageDisk>&);
     friend istream& operator>>(istream&, VintageDisk&);
-    friend istream& operator>>(istream&, VintageDisk*);
+    friend istream& operator>>(istream&, unique_ptr<VintageDisk>&);
     friend bool operator==(const VintageDisk&, const VintageDisk&);
     friend bool operator!=(const VintageDisk&, const VintageDisk&);
 

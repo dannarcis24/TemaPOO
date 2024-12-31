@@ -23,8 +23,9 @@ public:
     friend bool operator<(const Date&, const Date&);
     friend bool operator>=(const Date&, const Date&);
     friend bool operator>(const Date&, const Date&);
+    int operator-(const Date&) const;
     
-    bool esteMajor() const; // de gandit la un nume mai bun
+    bool isAdult() const; // de gandit la un nume mai bun
     const int years() const;
     bool isBirthday() const;
 };

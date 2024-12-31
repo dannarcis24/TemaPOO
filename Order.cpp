@@ -2,90 +2,106 @@
 
 long long Order::number = 0;
 
-void Order::validation(vector<Product*>& vec) 
+void Order::validation(vector<unique_ptr<Product>>& vec) 
 {
     if(vec.empty())
         throw DynamicException("comanda_invalida", "!! o comanda trebuie sa aiba cel putin un produs !!\n\n");
 
     int disks = 0, clothes = 0, price = 0;
-    for(auto i : vec)
+    for(auto i = vec.begin(); i != vec.end(); i++)
     {
-        if(typeid(*i) == typeid(Clothes)) 
+        if(typeid(**i) == typeid(Clothes)) 
         {
-            clothes += i->getNumber();
+            clothes += (*i)->getNumber();
             if(clothes > 3)
                 throw DynamicException("comanda_invalida", "!! o comanda poate sa contina maxim 5discuri si 3artcole vestimentare !!\n\n");
         }
         else
             {
-                disks += i->getNumber(); 
+                disks += (*i)->getNumber(); 
                 if(disks > 5)
                     throw DynamicException("comanda_invalida", "!! o comanda poate sa contina maxim 5discuri si 3artcole vestimentare !!\n\n");
             }
         
-        price += i->getPrice(false) * i->getNumber();
-
-        list.push_back(i);
+        price += (*i)->getPrice(false) * (*i)->getNumber();
     }
     if(price < 100)
-        throw DynamicException("comanda_invalida", "!! o comanda trebuie sa aiba pretul minim de 100lei, fara costuri suplimentare !!\n\n");      
+        throw DynamicException("comanda_invalida", "!! o comanda trebuie sa aiba pretul minim de 100lei, fara costuri suplimentare !!\n\n");    
+
+    for(auto i = vec.begin(); i != vec.end(); i++)
+        list.push_back(move(*i));
+    vec.clear();
 }
 
 Order::Order() {
     ID = "$" + to_string(Order::number++);
 }
 
-Order::Order(vector<Product*>& vec, int t): time(t) {
+Order::Order(vector<unique_ptr<Product>>& vec, int t): time(t) {
     validation(vec);
     ID = "$" + to_string(Order::number++);
 }
 
-Order::Order(const Order& elem): ID(elem.ID), time(elem.time), processing_date(elem.processing_date), list(elem.list) {
-    for(auto i : elem.list)
+Order::Order(const Order& elem): time(elem.time) {
+    for(auto i = elem.list.begin(); i != elem.list.end(); i++)
     {
-        Product* aux;
+        unique_ptr<Product> aux;
         if(typeid(*i) == typeid(Clothes))
-            aux = new Clothes;
+            aux = make_unique<Clothes>();
         else
             if(typeid(*i) == typeid(Disk))
-                aux = new Disk;
+                aux = make_unique<Disk>();
             else
-                aux = new VintageDisk;
+                aux = make_unique<VintageDisk>();
+        *aux = **i;
         
-        *aux = *i;
-        list.push_back(aux);
+        list.push_back(move(aux));
     }
+
+    ID = "$" + to_string(Order::number++);
 }
 
-Order::~Order() {
-    for(auto i : list)
-        delete i;
-    list.clear();
+Order::Order(Order&& elem): ID(move(elem.ID)), time(move(elem.time)), processing_date(move(elem.processing_date)) {
+    list = move(elem.list);
 }
 
 Order& Order::operator=(const Order& elem)
 {
+    if(this == &elem)
+        return *this;
+
     ID = elem.ID;
     time = elem.time;
     processing_date = elem.processing_date;
     
-    for(auto i : list)
-        delete i;
     list.clear();
-    for(auto i : elem.list)
+    for(auto i = elem.list.begin(); i != elem.list.end(); i++)
     {
-        Product* aux;
+        unique_ptr<Product> aux;
         if(typeid(*i) == typeid(Clothes))
-            aux = new Clothes;
+            aux = make_unique<Clothes>();
         else
             if(typeid(*i) == typeid(Disk))
-                aux = new Disk;
+                aux = make_unique<Disk>();
             else
-                aux = new VintageDisk;
+                aux = make_unique<VintageDisk>();
+        *aux = **i;
         
-        *aux = *i;
-        list.push_back(aux);
+        list.push_back(move(aux));
     }
+
+    return *this;
+}
+
+Order& Order::operator=(Order&& elem)
+{
+    if(this == &elem)
+        return *this;
+
+    ID = move(elem.ID);
+    time = move(elem.time);
+    processing_date = move(elem.processing_date);
+    list = move(elem.list);
 
     return *this;
 }
@@ -107,7 +123,7 @@ ostream& operator<<(ostream& out, const Order& elem)
     return out;
 }
 
-ostream& operator<<(ostream& out, const Order* elem)
+ostream& operator<<(ostream& out, const unique_ptr<Order>& elem)
 {
     elem->write(out);
 
@@ -131,36 +147,27 @@ void Order::read(istream& in)
     catch(const exception&) { throw DynamicException("numar_invalid", "!! numarul de produse trebuie sa fie un numar natural pozitiv nenul !!\n\n");}
 
     try {
-        vector<Product*> vec;
+        vector<unique_ptr<Product>> vec;
         for(register int i = 0; i < nr; i++)
         {
             if(&cin == &in)
                 cout<<"Introduceti tipul produsului " + to_string(i + 1) + " (articol vestimentar/disc/disc vintage): ";
             getline(in, aux);
             
-            Product* elem;
+            unique_ptr<Product> elem;
             if(aux == "articol vestimentar")
-            {
-                Product* elem = new Clothes;
-                in>>elem;
-                vec.push_back(elem);
-            }
+                elem = make_unique<Clothes>();
             else
                 if(aux == "disc")
-                    {
-                        elem = new Disk;
-                        in>>elem;
-                        vec.push_back(elem);
-                    }
+                    elem = make_unique<Disk>();
                 else
                     if(aux == "disc vintage")
-                    {
-                        elem = new VintageDisk;
-                        in>>elem;
-                        vec.push_back(elem);
-                    }
+                        elem = make_unique<VintageDisk>();
                     else
                         throw DynamicException("produs_invalid", "!! produsul trebuie sa fie unul dintre cele trei: articol vestimentar/disc/disc vintage !!\n\n");
+
+            in>>elem;
+            vec.push_back(move(elem));
         }
         validation(vec);
     } catch(const exception&) { throw;}
@@ -171,12 +178,12 @@ istream& operator>>(istream& in, Order& elem)
     Order aux;
     try{ aux.read(in);}
     catch(const exception&) { Order::number--; throw;}
-    elem = aux;
+    elem = move(aux);
 
     return in;
 }
 
-istream& operator>>(istream& in, Order* elem)
+istream& operator>>(istream& in, unique_ptr<Order>& elem)
 {
     try{ elem->read(in);}
     catch(const exception&) { Order::number--; throw;}
@@ -192,12 +199,12 @@ const double Order::getPrice() const
 {
     int sum = (*(list.begin()))->getPrice();
     for(auto i = ++list.begin(); i != list.end(); i++)
-        sum += (*i)->getPrice() + (*i)->getNumber();
+        sum += (*i)->getPrice() * (*i)->getNumber();
 
     return sum;
 }
 
-bool Order::verifStock(vector<Product*> products) const
+bool Order::verifStock(vector<unique_ptr<Product>>& products) const
 {
     if(list.empty())
         return false;

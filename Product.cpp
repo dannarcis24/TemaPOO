@@ -31,7 +31,7 @@ void Product::write(ofstream& out) const {
     out<<name<<','<<ID<<','<<number_products<<','<<price_base<<','<<getPrice();
 }
 
-ostream& operator<<(ostream& out, const Product* elem) 
+ostream& operator<<(ostream& out, const unique_ptr<Product>& elem) 
 {
     if(auto* aux = dynamic_cast<ofstream*>(&out))
         elem->write(*aux);
@@ -66,7 +66,7 @@ void Product::read(istream& in)
     catch(const exception&) { throw;}
 }
 
-istream& operator>>(istream& in, Product* elem) 
+istream& operator>>(istream& in, unique_ptr<Product>& elem) 
 {
     try{ elem->read(in);}
     catch(const exception&) { throw;}
@@ -74,11 +74,12 @@ istream& operator>>(istream& in, Product* elem)
     return in;
 }
 
-void Product::setNumberProducts(const int& nr) {
+void Product::setNumberProducts(const int nr) {
     if(nr < 0)
         throw DynamicException("numar_produse_invalid", "!! numarul de produse trebuie sa fie un numar natual pozitiv !!\n\n");
     number_products = nr;
 }
+
 
 bool Product::exist(const string& id) const {
     return (ID == id);
@@ -92,7 +93,7 @@ bool Product::isEqual(const Product& elem) const {
     return (name == elem.name && price_base == elem.price_base);
 } 
 
-bool compare(const Product* elem1, const Product* elem2)
+bool compare(const unique_ptr<Product>& elem1, const unique_ptr<Product>& elem2)
 {   
     if(elem1 == nullptr || elem2 == nullptr)
         return false;

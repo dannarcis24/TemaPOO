@@ -27,24 +27,28 @@ inline void Option1(Store& m, bool& exit) {
                     break;
                 }
                 case 2: {
-                    try{ m.employeeDel(searchID());}
+                    try { 
+                        m.employeeDel(searchID());
+                        cout<<"Stergerea a fost efectuata cu succes!\n\n";
+                    }
                     catch(const exception& e) { cout<<e.what();}
-                    cout<<"Stergerea a fost efectuata cu succes!\n\n";
                     break;
                 }
                 case 3: {
-                    try{ m.employeeSet(searchID(), name());}
+                    try { 
+                        m.employeeSet(searchID(), name());
+                        cout<<"Modificarea a fost efectuata cu succes!\n\n";
+                    }
                     catch(const exception& e) { cout<<e.what();}
-                    cout<<"Modificarea a fost efectuata cu succes!\n\n";
                     break;
                 }
                 case 4: {
-                    try{ writeEmployee(m);}
+                    try { writeEmployee(m);}
                     catch(const exception& e) { cout<<e.what();}
                     break;
                 }
                 case 5: {
-                    try{ writeEmployee(m, true);}
+                    try { writeEmployee(m, true);}
                     catch(const exception& e) { cout<<e.what();}
                     break;
                 }
@@ -82,24 +86,28 @@ inline void Option2(Store& m, bool& exit) {
                     break;
                 }
                 case 2: {
-                    try{ m.productDel(searchID());}
+                    try { 
+                        m.productDel(searchID());
+                        cout<<"Stergerea a fost efectuata cu succes!\n\n";
+                    }
                     catch(const exception& e) { cout<<e.what();}
-                    cout<<"Stergerea a fost efectuata cu succes!\n\n";
                     break;
                 }
                 case 3: {
-                    try{ m.productSet(searchID(), number());}
+                    try { 
+                        m.productSet(searchID(), number());
+                        cout<<"Modificarea a fost efectuata cu succes!\n\n";
+                    }
                     catch(const exception& e) { cout<<e.what();}
-                    cout<<"Modificarea a fost efectuata cu succes!\n\n";
                     break;
                 }
                 case 4: {
-                    try{ writeProducts(m);}
+                    try { writeProducts(m);}
                     catch(const exception& e) { cout<<e.what();}
                     break;
                 }
                 case 5: {
-                    try{ writeProducts(m, true);}
+                    try { writeProducts(m, true);}
                     catch(const exception& e) { cout<<e.what();}
                     break;
                 }

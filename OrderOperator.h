@@ -1,7 +1,7 @@
 #include "Order.h"
 
 class OrderOperator: public Employee {
-    vector<Order*> orders;
+    vector<unique_ptr<Order>> orders;
     double bonus = 0;
     unsigned int total_orders = 0;
 
@@ -10,22 +10,22 @@ class OrderOperator: public Employee {
 
 public:
     OrderOperator();
-    OrderOperator(vector<Order>&);
+    OrderOperator(vector<unique_ptr<Order>>&);
     OrderOperator(const OrderOperator&);
-
-    ~OrderOperator();
+    OrderOperator(OrderOperator&&);
 
     OrderOperator& operator=(const OrderOperator&);
+    OrderOperator& operator=(OrderOperator&&);
 
-    friend ostream& operator<<(ostream&, const OrderOperator*);
+    friend ostream& operator<<(ostream&, const shared_ptr<OrderOperator>&);
     friend ostream& operator<<(ostream&, const OrderOperator&);
     friend istream& operator>>(istream&, OrderOperator&);
-    friend istream& operator>>(istream&, OrderOperator*);
+    friend istream& operator>>(istream&, shared_ptr<OrderOperator>&);
 
     const int salary() const;
     
-    void orderAdd(Order*);
-    vector<Order*> orderFinish();
+    void orderAdd(unique_ptr<Order>&);
+    void orderFinish();
     const int ordersNumber() const;
     const int allOrders() const;
     double bonus4Orders() const;

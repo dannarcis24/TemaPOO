@@ -1,4 +1,4 @@
-4
+6
 articol vestimentar
 Tricou Polo
 50
@@ -31,3 +31,23 @@ Sgt. Pepper's Lonely Hearts Club Band
 1
 5
 1
+disc
+Abbey Road
+15
+120.0
+Apple Records
+The Beatles
+Abbey Road
+26.09.1969
+1
+disc vintage
+The Wall
+8
+350.0
+Harvest
+Pink Floyd
+The Wall
+30.11.1979
+1
+4
+0

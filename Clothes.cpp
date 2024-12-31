@@ -8,6 +8,14 @@ Clothes::Clothes(const string& name, int number1, double price, const string& cu
         throw DynamicException("marca_invalida", "!! marca nu poate sa fie un sir gol!!\n\n");
 }
 
+Clothes::Clothes(const Product& product, const string& culoare, const string& marca): Product(product), color(culoare), brand(marca) 
+{
+    if(color.empty())
+        throw DynamicException("culoare_invalida", "!! culoarea nu poate sa fie un sir gol !!\n\n");
+    if(brand.empty())
+        throw DynamicException("marca_invalida", "!! marca nu poate sa fie un sir gol!!\n\n");
+}
+
 const double Clothes::getPrice(bool cost) const {
     return (cost ? (20 + price_base) : price_base);
 }
@@ -31,7 +39,7 @@ ostream& operator<<(ostream& out, const Clothes& elem)
     return out;
 }
 
-ostream& operator<<(ostream& out, const Clothes* elem)
+ostream& operator<<(ostream& out, const unique_ptr<Clothes>& elem)
 {
     if(auto* aux = dynamic_cast<ofstream*>(&out))
         elem->write(*aux);
@@ -66,7 +74,7 @@ istream& operator>>(istream& in, Clothes& elem)
     return in;
 }
 
-istream& operator>>(istream& in, Clothes* elem)
+istream& operator>>(istream& in, unique_ptr<Clothes>& elem)
 {
     Clothes aux;
     try{ aux.read(in);}

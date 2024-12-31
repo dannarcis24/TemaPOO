@@ -45,7 +45,7 @@ ostream& operator<<(ostream& out, const Disk& elem)
     return out;
 }
 
-ostream& operator<<(ostream& out, const Disk* elem)
+ostream& operator<<(ostream& out, const unique_ptr<Disk>& elem)
 {
     if(auto* aux = dynamic_cast<ofstream*>(&out))
         elem->write(*aux);
@@ -100,7 +100,7 @@ istream& operator>>(istream& in, Disk& elem)
     return in;
 }
 
-istream& operator>>(istream& in, Disk* elem)
+istream& operator>>(istream& in, unique_ptr<Disk>& elem)
 {
     try{ elem->read(in);}
     catch(const exception&) {Product::number--; throw;}

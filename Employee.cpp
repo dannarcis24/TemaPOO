@@ -75,7 +75,7 @@ void Employee::validationCNP() const
             throw DynamicException("cnp_invalid", "!! un CNP valid este format din cifre 0-9 !!\n\n");
     
     Date data_nasterii = birthday();
-    if(!data_nasterii.esteMajor())
+    if(!data_nasterii.isAdult())
         throw DynamicException("data_invalida", "!! persoana, care trebuie angajata, trebuie sa aiba minim 18ani impliniti !!\n\n");
 
     int jud = stoi(CNP.substr(7, 2));
@@ -143,6 +143,12 @@ void Employee::setName(const string& sir)
     last_name = sir;
 }
 
+void Employee::setName(string&& sir)
+{
+    validationString(sir);
+    last_name = move(sir);
+}
+
 void Employee::write(ostream& out) const
 {
     out<<"////// INFORMATII DESPRE ANGAJATUL: "<<last_name<<' '<<first_name<<" //////\n\n";
@@ -153,7 +159,7 @@ void Employee::write(ofstream& out) const {
     out<<last_name<<','<<first_name<<','<<CNP<<','<<ID<<','<<position()<<','<<employment_date<<','<<salary();
 }
 
-ostream& operator<<(ostream& out, const Employee* elem) 
+ostream& operator<<(ostream& out, const shared_ptr<Employee>& elem) 
 {
     if(auto* aux = dynamic_cast<ofstream*>(&out))
         elem->write(*aux);
@@ -173,31 +179,6 @@ ostream& operator<<(ostream& out, const Employee elem)
 
 void Employee::read(istream& in)
 {
-    if(&in == &cin)
-    {
-        cout<<"Introduceti pozitia angajatului (manager/asistent/operator comenzi): ";
-        string pozitie;
-        getline(in, pozitie);
-
-        if(pozitie == "manager") {   
-            job = false;
-            coefficient = 1.25;
-        }
-        else
-            if(pozitie == "asistent") {
-                job = true;
-                coefficient = 0.75;
-            }
-            else
-                if(pozitie == "operator comenzi")
-                {
-                    job = true;
-                    coefficient = 1;
-                }
-                else
-                    throw DynamicException("pozitie_invalida", "!! pozitia angajatului trebuie sa fie una dintre cele trei: manager/asistent/operator comenzi !!\n\n");
-    }
-
     if(&in == &cin)
         cout<<"Introduceti numele: ";
     getline(in, last_name);
@@ -222,23 +203,17 @@ istream& operator>>(istream& in, Employee& elem)
 {
     Employee aux;
     
-    try {
-        aux.read(in);
-        if(elem.coefficient == 1 && typeid(elem) == typeid(Employee))
-            throw DynamicException("pozitie_invalida", "!! pentru a retine un operator de comenzi, trebuie sa folositi pozitia corespunzatoare !!\n\n");
-    } catch(const exception&) { Employee::number--; throw;}
+    try { aux.read(in);} 
+    catch(const exception&) { Employee::number--; throw;}
     elem = aux;
 
     return in;
 }
 
-istream& operator>>(istream& in, Employee* elem)
+istream& operator>>(istream& in, unique_ptr<Employee>& elem)
 {  
-    try {
-        elem->read(in);
-        if(elem->coefficient == 1 && typeid(*elem) == typeid(Employee))
-            throw DynamicException("pozitie_invalida", "!! pentru a retine un operator de comenzi, trebuie sa folositi pozitia corespunzatoare !!\n\n");
-    } catch(const exception&) { Employee::number--; throw;}
+    try { elem->read(in);} 
+    catch(const exception&) { Employee::number--; throw;}
 
     return in;
 }
@@ -251,6 +226,6 @@ bool Employee::exist(const string& id) const {
     return (ID == id);
 }
 
-bool compareByName(const Employee* elem1, const Employee* elem2) {
+bool compareByName(const shared_ptr<Employee>& elem1, const shared_ptr<Employee>& elem2) {
     return ((elem1->last_name + elem1->first_name) > (elem2->last_name + elem2->first_name));
 }

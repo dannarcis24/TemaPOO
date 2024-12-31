@@ -57,32 +57,44 @@ const string name()
     return name;
 }
 
-void readEmployeeFromFile(Store& m, ifstream& in)
+void readEmployee(Store& m, istream& in)
 {
-    unsigned int nr = number(in);
+    unsigned int nr = (&in == &cin ? number() : number(dynamic_cast<ifstream&>(in)));
 
     for(register int i = 0; i < nr; i++)
     {
+        if(&in == &cin)
+            cout<<"Introduceti pozitia angajatului, pe care doriti sa-l adaugati (manager/ asistent/ operator de comenzi): ";
         string option;
         getline(in, option);
 
-        Employee* elem;
+        unique_ptr<Employee> elem;
         if(option == "manager" || option == "asistent")
-            elem = new Employee(option);
+            elem = make_unique<Employee>(option);
         else
             if(option == "operator comenzi")
-                elem = new OrderOperator;
+                elem = make_unique<OrderOperator>();
             else
             {
                 cout<<"pozitie_invalida: !! pozitia trebuie sa fie una dintre cele trei (manager/asistent/operator comenzi) !!\n\n";
-                return;
+                if(&in == &cin) {
+                    i--; continue;
+                }
+                else
+                    return;
             }
 
         try{ in>>elem;}
         catch(const exception& e) { 
-            delete elem; 
-            cout<<"Angajatul "<<i<<" (toti angajatii, care urmeaza dupa acesta nu vor putea fi adaugati): "<<e.what(); 
-            return;
+            elem.reset(); 
+            if(&in == &cin) { 
+                cout<<e.what();
+                i--; continue;
+            }
+            else {
+                cout<<"Angajatul "<<i<<" (toti angajatii, care urmeaza dupa acesta nu vor putea fi adaugati): "<<e.what(); 
+                return;
+            }
         }
         m.employeeAdd(elem);
     }
@@ -97,17 +109,7 @@ void addEmployee(Store& m)
     getline(cin, option);
 
     if(option == "tastatura")
-    {
-        cout<<"Pentru a adauga manageri/asistenti introduceti 0, pentru a adauga operator de comenzi introduceti 1: ";
-        getline(cin, option);
-        if(option == "0")
-            readEmployee<Employee>(m);
-        else
-            if(option == "1")
-                readEmployee<OrderOperator>(m);
-            else
-                cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele doua: 0/1 !!\n\n";
-    }
+        readEmployee(m, cin);
     else
         if(option == "fisier")
         {
@@ -121,7 +123,7 @@ void addEmployee(Store& m)
                 cout<<"fisier_inexistent: !! fisierul nu exista sau nu poate fi deschis !!\n\n";
             else
             {
-                readEmployeeFromFile(m, in);
+                readEmployee(m, in);
                 in.close();
             }
         }
@@ -164,36 +166,49 @@ void writeEmployee(Store& m, bool all)
             cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele doua: consola/fisier !!\n\n";
 }
 
-void readProductFromFile(Store& m, ifstream& in)
+void readProduct(Store& m, istream& in)
 {
-    unsigned int nr = number(in);
+    unsigned int nr = (&in == &cin ? number() : number(dynamic_cast<ifstream&>(in)));
 
     for(register int i = 0; i < nr; i++)
-    {
+    {   
+        if(&in == &cin)
+            cout<<"Introduceti tipul produsului, pe care doriti sa-l adaugati (articol vestimentar/ disc/ disc vintage): ";
         string option;
         getline(in, option);
 
-        Product* elem;
+        unique_ptr<Product> elem;
         if(option == "articol vestimentar")
-            elem = new Clothes;
+            elem = make_unique<Clothes>();
         else
             if(option == "disc")
-                elem = new Disk;
+                elem = make_unique<Disk>();
             else
                 if(option == "disc vintage")
-                    elem = new VintageDisk;
+                    elem = make_unique<VintageDisk>();
                 else
                 {
                     cout<<"pozitie_invalida: !! pozitia trebuie sa fie una dintre cele trei (articol vestimentar/disc/disc vintage) !!\n\n";
-                    return;
+                        if(&in == &cin) {
+                        i--; continue;
+                    }
+                    else
+                        return;
                 }
 
         try{ in>>elem;}
         catch(const exception& e) { 
-            delete elem; 
-            cout<<"Produsul "<<i<<" (toate produsele, care urmeaza dupa acesta nu vor putea fi adaugate): "<<e.what(); 
-            return;
+            elem.reset(); 
+            if(&in == &cin) { 
+                cout<<e.what();
+                i--; continue;
+            }
+            else {
+                cout<<"Produsul "<<i<<" (toate produsele, care urmeaza dupa acesta nu vor putea fi adaugate): "<<e.what(); 
+                return;
+            }
         }
+
         m.productAdd(elem);
     }
 
@@ -207,21 +222,7 @@ void addProduct(Store& m)
     getline(cin, option);
 
     if(option == "tastatura")
-    {
-        cout<<"Pentru a adauga haine introduceti 0, pentru discuri introduceti 1, iar pentru discuri vintage introduceti 2: ";
-        getline(cin, option);
-
-        if(option == "0")
-            readProduct<Clothes>(m);
-        else
-            if(option == "1")
-                readProduct<Disk>(m);
-            else
-                if(option == "2")
-                    readProduct<VintageDisk>(m);
-                else
-                    cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele trei: 0/1/2 !!\n\n";
-    }
+        readProduct(m, cin);
     else
         if(option == "fisier")
         {
@@ -237,7 +238,7 @@ void addProduct(Store& m)
                 cout<<"fisier_inexistent: !! fisierul nu exista sau nu poate fi deschis !!\n\n";
             else
             {
-                readProductFromFile(m, in);
+                readProduct(m, in);
                 in.close();
             }
         }
@@ -273,17 +274,17 @@ void writeProducts(Store& m, bool all)
             cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele doua: consola/fisier !!\n\n";
 }
 
-vector<Order*> readOrders(istream& in)
+vector<unique_ptr<Order>> readOrders(istream& in)
 {
-    vector<Order*> orders;
+    vector<unique_ptr<Order>> orders;
     unsigned int nr = (&in == &cin ? number() : number(dynamic_cast<ifstream&>(in)));
 
     for(register int i = 0; i < nr; i++)
     {
-        Order* elem = new Order; 
+        unique_ptr<Order> elem = make_unique<Order>(); 
         try{ in>>elem;}
         catch(const exception& e) { 
-            delete elem;
+            elem.reset();
 
             if(&in == &cin) 
             {
@@ -298,7 +299,7 @@ vector<Order*> readOrders(istream& in)
             }
         }
 
-        orders.push_back(elem);
+        orders.push_back(move(elem));
     }
 
     cout<<"Adaugarea a fost efectuata cu succes!\n\n";

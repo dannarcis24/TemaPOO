@@ -18,9 +18,9 @@ public:
     Disk(const string&, int, double, const string&, const string&, const string&, int, int, int, bool);
 
     friend ostream& operator<<(ostream&, const Disk&);
-    friend ostream& operator<<(ostream&, const Disk*);
+    friend ostream& operator<<(ostream&, const unique_ptr<Disk>&);
     friend istream& operator>>(istream&, Disk&);
-    friend istream& operator>>(istream&, Disk*);
+    friend istream& operator>>(istream&, unique_ptr<Disk>&);
     friend bool operator==(const Disk&, const Disk&);
     friend bool operator!=(const Disk&, const Disk&);
 

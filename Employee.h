@@ -1,11 +1,12 @@
 #include "Date.h"
 #include <fstream>
 #include <typeinfo>
+#include <memory>
 
 class Employee {
 protected:
-    string last_name, first_name, CNP, ID = "@0";
-    Date employment_date = Date();
+    string last_name, first_name, CNP, ID; // ID = "@number";
+    Date employment_date;
     double coefficient;
     bool job = true; // assistent(true) or manager(false)
 
@@ -14,7 +15,7 @@ protected:
 
     virtual void write(ostream&) const;
     virtual void write(ofstream&) const;
-    void read(istream&);
+    virtual void read(istream&);
 
 public:
     Employee();
@@ -23,16 +24,15 @@ public:
     Employee(const string&, const string&, const string&, const string&, bool);
     Employee(const string&);
 
-    friend ostream& operator<<(ostream&, const Employee*);
+    friend ostream& operator<<(ostream&, const shared_ptr<Employee>&);
     friend ostream& operator<<(ostream&, const Employee); 
     friend istream& operator>>(istream&, Employee&);
-    friend istream& operator>>(istream&, Employee*);
-    friend bool compareByName(const Employee*, const Employee*);
-
-    // de implementat citirea
+    friend istream& operator>>(istream&, unique_ptr<Employee>&);
+    friend bool compareByName(const shared_ptr<Employee>&, const shared_ptr<Employee>&);
 
     virtual const int salary() const;
     void setName(const string&);
+    void setName(string&&);
     const string position() const;
     bool exist(const string&) const;
 

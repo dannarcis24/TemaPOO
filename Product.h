@@ -2,7 +2,7 @@
 
 class Product {
 protected:
-    string name, ID = "#0";
+    string name, ID; // ID  = "#number";
     unsigned int number_products = 0;
     double price_base = 0;
 
@@ -18,13 +18,13 @@ public:
     Product(const string&, int, double);
     virtual ~Product() = default;
 
-    friend ostream& operator<<(ostream&, const Product*);
-    friend istream& operator>>(istream&, Product*);
-    friend bool compare(const Product*, const Product*);
+    friend ostream& operator<<(ostream&, const unique_ptr<Product>&);
+    friend istream& operator>>(istream&, unique_ptr<Product>&);
+    friend bool compare(const unique_ptr<Product>&, const unique_ptr<Product>&);
 
     virtual const double getPrice(bool = true) const = 0;
 
-    void setNumberProducts(const int&);
+    void setNumberProducts(const int);
     bool exist(const string&) const;
     const int getNumber() const;
 };

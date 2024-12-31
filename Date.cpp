@@ -28,9 +28,6 @@ void Date::validationDate(const string data)
 
 void Date::validationDate() const
 {
-    if(year < 1900)
-        throw DynamicException("data_invalida", "!! anul < 1900, este invalid !!\n\n");
-
     if(month <= 0 || day <= 0 || year <= 0)
         throw DynamicException("data_invalida", "!! luna, ziua si anul trebuie sa fie numere naturale pozitive nenule !!\n\n");
 
@@ -126,26 +123,26 @@ bool operator<(const Date& elem1, const Date& elem2) {
     return !(elem1 >= elem2);
 }
 
-bool Date::esteMajor() const
+int Date::operator-(const Date& elem) const
 {
-    const Date& today = currentDate();
+    if(*this == elem)
+        return 0;
     
-    int age = today.year - year;
-    if(month < today.month || (month == today.month && day < today.day))
-        age--;
-
-    return (age >= 18);
+    int years = year - elem.year;
+    if(years < 0)
+        years = -years;
+    if(month < elem.month || (month == elem.month && day < elem.day))
+        years--;
+    
+    return years;
 }
 
-const int Date::years() const 
-{
-    const Date& today = currentDate();
+bool Date::isAdult() const {
+    return ((currentDate() - *this) >= 18);
+}
 
-    int years = today.year - year;
-    if(month < today.month || (month == today.month && day < today.day))
-        years--;
-
-    return years;
+const int Date::years() const {
+    return (currentDate() - *this);
 }
 
 bool Date::isBirthday() const  {

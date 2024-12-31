@@ -10,9 +10,11 @@ private:
 
 public:
     DynamicException() = delete;
-    DynamicException(const string& name, const string& s): message(name + ": " + s) {
+    DynamicException(const string& name, const string& s) {
         if(name.empty() || s.empty())
             throw invalid_argument("!! numele si mesajul unei exceptii nu pot fi goale !!\n\n");
+
+        message = name + ": " + s;
     }
 
     const char* what() const noexcept override {

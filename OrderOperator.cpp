@@ -1,43 +1,55 @@
 #include "OrderOperator.h"
 
-OrderOperator::OrderOperator(vector<Order>& vec)
+OrderOperator::OrderOperator() {
+    coefficient = 1;
+    job = true;
+}
+
+OrderOperator::OrderOperator(vector<unique_ptr<Order>>& vec)
 {
     if(vec.size() > 3)
         throw DynamicException("cerere_invalida", "!! un operator de comenzi nu poate gestiona mai mult de 3comenzi in paralel !!\n\n");
     
     if(!vec.empty())
         for(auto i = vec.begin(); i != vec.end(); i++)
-            orders.push_back(&(*i));
-}
-
-OrderOperator::OrderOperator() {
-    coefficient = 1;
-    job = true;
+            orders.push_back(move(*i));
 }
 
 OrderOperator::OrderOperator(const OrderOperator& elem): Employee(elem), bonus(elem.bonus), total_orders(elem.total_orders) {
-    for(auto i : elem.orders)
-        orders.push_back(new Order(*i));
+    for(auto i = elem.orders.begin(); i != elem.orders.end(); i++)
+        orders.push_back(make_unique<Order>(**i));
 }
 
-OrderOperator::~OrderOperator()
-{
-    for(auto& i : orders)
-        delete i;
-    orders.clear();
+OrderOperator::OrderOperator(OrderOperator&& elem): Employee(move(elem)), bonus(elem.bonus), total_orders(elem.total_orders) {
+    orders = move(elem.orders);
 }
 
 OrderOperator& OrderOperator::operator=(const OrderOperator& elem)
 {
+    if(this == &elem)
+        return *this;
+
     Employee::operator=(elem);
     bonus = elem.bonus;
     total_orders = elem.total_orders;
 
-    for(auto i : orders)
-        delete i;
     orders.clear();
-    for(auto i : elem.orders)
-        orders.push_back(new Order(*i));
+    for(auto i = elem.orders.begin(); i != elem.orders.end(); i++)
+        orders.push_back(make_unique<Order>(**i));
+
+    return *this;
+}
+
+OrderOperator& OrderOperator::operator=(OrderOperator&& elem)
+{
+    if(this == &elem)
+        return *this;
+
+    Employee::operator=(move(elem));
+    bonus = move(elem.bonus);
+    total_orders = move(elem.total_orders);
+    orders.clear();
+    orders = move(elem.orders);
 
     return *this;
 }
@@ -46,38 +58,42 @@ const int OrderOperator::salary() const {
     return (Employee::salary() + bonus);
 }
 
-void OrderOperator::orderAdd(Order* elem)
+void OrderOperator::orderAdd(unique_ptr<Order>& elem)
 {
     if(orders.size() == 3)
         throw DynamicException("cerere_invalida", "!! un operator de comenzi nu poate gestiona mai mult de 3comenzi in paralel !!\n\n");
     
-    orders.push_back(new Order(*elem));
+    orders.push_back(move(elem));
 }
 
-vector<Order*> OrderOperator::orderFinish()
+void OrderOperator::orderFinish()
 {
-    vector<Order*> vec;
-    if(orders.empty())  return vec;
+    if(orders.empty())  
+        return;
 
+    unsigned work = orders.size(), finish = work;
     for(auto i = orders.begin(); i != orders.end();)
         if((*i)->getTime() == 0)
         {
             total_orders++;
+            finish--;
             bonus += 0.005 * (*i)->getPrice();
 
-            vec.push_back(new Order(*(*i)));
             i = orders.erase(i);
         }
         else
+        {
             i++;
-
-    return vec;
+            work--;
+        }
+    
+    cout<<"Operatorul de comenzi cu ID ul "<<ID<<" a finalizat "<<finish<<" comenzi si mare are de terminat "<<work<<" comenzi de impachetat si livrat.\n";
 }
 
 void OrderOperator::write(ostream& out) const
 {
     Employee::write(out);
-    out<<"\nInformatii privind gestiunea operatorului\nNumarul total de comenzi procesate: "<<total_orders<<"\nBonusul acumulat, in urma comenzilor realizate: "<<bonus;
+    out<<"\nInformatii privind gestiunea operatorului\nNumarul total de comenzi procesate: "<<total_orders<<"\nBonusul acumulat, in urma comenzilor realizate: "<<bonus<<'\n';
 }
 
 void OrderOperator::write(ofstream& out) const {
@@ -85,7 +101,7 @@ void OrderOperator::write(ofstream& out) const {
     out<<','<<total_orders<<','<<bonus;
 }
 
-ostream& operator<<(ostream& out, const OrderOperator* elem) 
+ostream& operator<<(ostream& out, const shared_ptr<OrderOperator>& elem) 
 {
     if(auto* aux = dynamic_cast<ofstream*>(&out))
         elem->write(*aux);
@@ -115,7 +131,7 @@ istream& operator>>(istream& in, OrderOperator& elem)
     return in;
 }
 
-istream& operator>>(istream& in, OrderOperator* elem)
+istream& operator>>(istream& in, shared_ptr<OrderOperator>& elem)
 {
     OrderOperator aux;
     aux.read(in);

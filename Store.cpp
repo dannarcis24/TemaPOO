@@ -29,21 +29,21 @@ void Store::validationEmployees() const
 void Store::validationProducts() const
 {
     vector<int> number = vector<int>(3, 0);
-    for(auto i : products)
+    for(auto i = products.begin(); i != products.end(); i++)
     {
-        if(typeid(*i) == typeid(Clothes))
-            number[0] += i->getNumber();
+        if(typeid(**i) == typeid(Clothes))
+            number[0]++;
         else
-            if(typeid(*i) == typeid(Disk))
-                number[1] += i->getNumber();
+            if(typeid(**i) == typeid(Disk))
+                number[1]++;
             else
-                number[2] += i->getNumber();
+                number[2]++;
         
         if(count_if(number.begin(), number.end(), [](int x) { return (x >= 2); }) == 3)
             break;
     }
 
-    if(any_of(number.begin(), number.end(), [](int x) { return (x < 2); }))
+    if(any_of(number.begin(), number.end(), [](int x) { return (x < 2);}))
         throw DynamicException("magazin_nefunctional", "!! magazinul trebuie sa aiba cel putin cate 2produse din fiecare tip !!\n\n");
 }
 
@@ -52,64 +52,69 @@ void Store::validation() const{
     validationProducts();
 }
 
-Store::~Store()
-{
-    for(auto& i : employees)
-        delete i;
-    
-    for(auto& i : products)
-        delete i;
-    
-    for(auto i = operators.top(); !operators.empty(); operators.pop())
-        delete i;
-
-    for(auto i = orders.top(); !orders.empty(); orders.pop())
-        delete i;
-}
-
 /* IMPLEMENTARE METODE PENTRU GESTIUNEA ANGAJATILOR */
-void Store::employeeAdd(Employee* elem) {
-    if(elem->position() == "operator comenzi")
-        operators.push(dynamic_cast<OrderOperator*>(elem));
-    else
-        employees.push_back(elem);
+vector<shared_ptr<OrderOperator>> Store::queue2Vec()
+{
+    vector<shared_ptr<OrderOperator>> vec;
+    if(operators.empty())
+        return vec;
+
+    vector<shared_ptr<OrderOperator>> aux;
+    bool ok = false;
+    for(; !operators.empty(); operators.pop())
+        vec.push_back(operators.top());
+
+    for(auto i : vec)
+        operators.push(i);
+
+    return vec;
 }
 
-void Store::employeeAdd(OrderOperator* elem) {
-    operators.push(elem);
+void Store::employeeAdd(unique_ptr<Employee>& elem) {
+    if(elem->position() == "operator comenzi")
+    {
+        shared_ptr<Employee> aux = move(elem);
+        operators.push(dynamic_pointer_cast<OrderOperator>(move(aux)));
+    }
+    else
+        employees.push_back(move(elem));
+}
+
+void Store::employeeAdd(unique_ptr<OrderOperator>& elem) {
+    operators.push(move(elem));
 }
 
 void Store::employeeAdd(Employee& elem) {
-    employees.push_back(&elem);
+    employees.push_back(make_unique<Employee>(elem));
+}
+
+void Store::employeeAdd(Employee&& elem) {
+    employees.push_back(make_unique<Employee>(move(elem)));
 }
 
 void Store::employeeAdd(OrderOperator& elem) {
-    operators.push(&elem);
+    operators.push(make_shared<OrderOperator>(elem));
 }
 
-Employee* Store::employeeExist(const string& ID) const
-{
-    if(employees.empty())
-        return nullptr;
-    
-    for(auto i = employees.begin(); i != employees.end(); i++)
-        if((*i)->exist(ID))
-            return *i;
+void Store::employeeAdd(OrderOperator&& elem) {
+    operators.push(make_shared<OrderOperator>(move(elem)));
+}
 
-    return nullptr;
+vector<shared_ptr<Employee>>::const_iterator Store::employeeExist(const string& ID) const {
+    return find_if(employees.begin(), employees.end(), [&ID](const shared_ptr<Employee>& x) { return x->exist(ID);});
 }
 
 void Store::employeeDel(const string& ID)
 {
-    Employee* elem = employeeExist(ID);
-    if(elem)
-        employees.erase(find(employees.begin(), employees.end(), elem));
+    auto&& elem = employeeExist(ID);
+    if(elem != employees.end()) 
+        employees.erase(elem);
     else
     {
         if(operators.empty())
             throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
 
-        vector<OrderOperator*> aux;
+        vector<shared_ptr<OrderOperator>> aux;
         bool ok = false;
         for(; !operators.empty(); operators.pop())
         {
@@ -127,6 +132,7 @@ void Store::employeeDel(const string& ID)
 
         for(auto& i : aux)
             operators.push(i);
+        aux.clear();
 
         if(!ok)
             throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
@@ -134,75 +140,51 @@ void Store::employeeDel(const string& ID)
     validationEmployees();
 }
 
-void Store::employeeSet(const string&ID, const string& name)
+void Store::employeeSet(const string& ID, string&& name)
 {
-    Employee* elem = employeeExist(ID);
-    if(elem)
-        elem->setName(name);
+    auto&& elem = employeeExist(ID);
+    if(elem != employees.end())
+        (*elem)->setName(move(name));
     else
     {
         if(operators.empty())
             throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
 
-        vector<OrderOperator*> aux;
-        bool ok = false;
-        for(; !operators.empty(); operators.pop())
+        vector<shared_ptr<OrderOperator>> vec = queue2Vec();
+        auto&& elem1 = find_if(vec.begin(), vec.end(), [&ID](const shared_ptr<OrderOperator>& x) { return x->exist(ID);});
+        if(elem1 == vec.end())
         {
-            auto i = operators.top();
-
-            if(i->exist(ID))
-            {
-                ok = true;
-                i->setName(name);
-                operators.pop();
-                operators.push(i);
-                break;
-            }
-
-            aux.push_back(i);
-        }
-
-        for(auto& i : aux)
-            operators.push(i);
-
-        if(!ok)
+            vec.clear();
             throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
+        }
+        (*elem1)->setName(move(name));
+        vec.clear();
     }
+}
+
+void Store::employeeSet(const string& ID, const string& name) {
+    employeeSet(ID, string(name));    
 }
 
 void Store::employeeInf(const string& ID, ostream& out)
 {
-    Employee* elem = employeeExist(ID);
-    if(elem)
-        out<<elem;
+    auto&& elem = employeeExist(ID);
+    if(elem != employees.end())
+        out<<*elem;
     else
     {
         if(operators.empty())
             throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
 
-        vector<OrderOperator*> aux;
-        bool ok = false;
-        for(; !operators.empty(); operators.pop())
-        {   
-            auto i = operators.top();
-
-            if(i->exist(ID))
-            {
-                operators.pop();
-                operators.push(i);
-                ok = true;
-                out<<i;
-                break;
-            }
-
-            aux.push_back(i);
-        }
-
-        for(auto& i : aux)
-            operators.push(i);
-
-        if(!ok)
+        vector<shared_ptr<OrderOperator>> vec = queue2Vec();
+        auto&& elem1 = find_if(vec.begin(), vec.end(), [&ID](const shared_ptr<OrderOperator>& x) { return x->exist(ID);});
+        if(elem1 == vec.end())
+        {
+            vec.clear();
             throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
+        }
+        cout<<*elem1;
+        vec.clear();
     }
 }
 
@@ -216,22 +198,44 @@ void Store::employeesWrite(ostream& out)
     
     if(!operators.empty())
     {
-        vector<OrderOperator*> aux;
+        vector<shared_ptr<OrderOperator>> vec;
         for(; !operators.empty(); operators.pop())
         {
             auto i = operators.top();
             out<<i<<'\n';
-            aux.push_back(i);
+            vec.push_back(move(i));
         }
 
-        for(auto& i : aux)
-            operators.push(i);
+        for(auto& i : vec)
+            operators.push(move(i));
+        vec.clear();
     }
 }   
 
 /* IMPLEMENTARE METODE PENTRU GESTIUNEA PRODUSELOR */
-void Store::productAdd(Product* elem) {
-    products.push_back(elem);
+void Store::productAdd(unique_ptr<Product>& elem) {
+    products.push_back(move(elem));
+}
+
+template<class T>
+void Store::productAdd(T&& elem)
+{
+    auto aux = typeid(elem);
+    if(aux == typeid(Clothes) || aux == typeid(Disk) || aux == typeid(VintageDisk))
+    {
+        unique_ptr<Product> aux1;
+        if(aux == typeid(Clothes))
+            aux1 = make_unique<Clothes>(move(elem));
+        else
+            if(aux == typeid(Disk))
+                aux1 = make_unique<Disk>(move(elem));
+            else
+                aux1 = make_unique<VintageDisk>(move(elem));
+        
+        products.push_back(move(aux1));
+    }
+    else
+        throw DynamicException("produs_inexistent", "!! produsul nu exista in stocul magazinului !!\n\n");
 }
 
 template<class T>
@@ -239,18 +243,18 @@ void Store::productAdd(T& elem)
 {
     auto aux = typeid(elem);
     if(aux == typeid(Clothes) || aux == typeid(Disk) || aux == typeid(VintageDisk))
-        products.push_back(&elem);
+        productAdd(T(elem));
     else
         throw DynamicException("produs_inexistent", "!! produsul nu exista in stocul magazinului !!\n\n");
 }
 
-vector<Product*>::const_iterator Store::productExist(const string& ID) const {
-    return find_if(products.begin(), products.end(), [&ID](Product* x) { return x->exist(ID);});
+vector<unique_ptr<Product>>::const_iterator Store::productExist(const string& ID) const {
+    return find_if(products.begin(), products.end(), [&ID](const unique_ptr<Product>& x) { return x->exist(ID);});
 }
 
 void Store::productDel(const string& ID)
 {
-    vector<Product*>::const_iterator elem = productExist(ID);
+    auto&& elem = productExist(ID);
     if(elem != products.end())
         products.erase(elem);
     else
@@ -258,9 +262,9 @@ void Store::productDel(const string& ID)
     validationProducts();
 }
 
-void Store::productSet(const string& ID, int number)
+void Store::productSet(const string& ID, const int number)
 {
-    vector<Product*>::const_iterator elem = productExist(ID);
+    auto&& elem = productExist(ID);
     if(elem != products.end())
         (*elem)->setNumberProducts(number);
     else
@@ -269,7 +273,7 @@ void Store::productSet(const string& ID, int number)
 
 void Store::productInf(const string& ID, ostream& out) const
 {
-    vector<Product*>::const_iterator elem =  productExist(ID);
+    auto&& elem =  productExist(ID);
     if(elem != products.end())
         out<<*elem;
     else
@@ -286,43 +290,27 @@ void Store::productsWrite(ostream& out) const
 }
 
 /* IMPLEMENTARE METODE PENTRU GESTIUNEA COMENZILOR */
-void Store::orderAdd(const vector<Order*>& elem) {
-    for(auto& i : elem)
-        orders.push(i);
+void Store::orderAdd(vector<unique_ptr<Order>>&& elem) {
+    for(auto i = elem.begin(); i != elem.end(); i++)
+        orders.push(move(*i));
+    elem.clear();
 }
 
 bool Store::orderExist() {
     if(orders.empty())
     {
-        vector<OrderOperator*> vec;
-        for(; !operators.empty(); operators.pop())
-            vec.push_back(new OrderOperator(*(operators.top())));
-        int nr = count_if(vec.begin(), vec.end(), [](OrderOperator* elem) {return (elem->ordersNumber() != 0);});
-
-        for(auto i : vec)
-            operators.push(i);
+        vector<shared_ptr<OrderOperator>> vec = queue2Vec();
+        int nr = count_if(vec.begin(), vec.end(), [](const shared_ptr<OrderOperator>& elem) {return (elem->ordersNumber() != 0);});
         vec.clear();
 
         return (nr > 0);
     }
-    else
-        return true;
+    
+    return true;
 }
 
-int Store::orderNumber() 
-{
-    vector<Order*> vec;
-
-    for(; !orders.empty(); orders.pop())
-        vec.push_back(new Order(*(orders.top())));
-    orderAdd(vec);
-
-    int nr = vec.size();
-    for(auto i : vec)
-        delete i;
-    vec.clear();
-
-    return nr;
+int Store::orderNumber()  {
+    return orders.size();
 }
 
 void Store::order2Operator()
@@ -332,13 +320,14 @@ void Store::order2Operator()
 
     for(; !orders.empty() && (operators.top())->ordersNumber() < 3; orders.pop())
     {
-        Order* order = new Order(*(orders.top()));
+        unique_ptr<Order> order = move(const_cast<unique_ptr<Order>&>(orders.top()));
         cout<<"Comanda a fost asignata unui operator de comenzi\n"<<order;
 
         bool ok = order->verifStock(products);
-        products.erase(remove_if(products.begin(), products.end(), [](const Product* elem) { return (elem->getNumber() == 0);}), products.end());
+        if(!ok)
+            continue;
 
-        OrderOperator* aux = new OrderOperator(*(operators.top()));
+        shared_ptr<OrderOperator> aux = operators.top();
         aux->orderAdd(order);
         operators.pop();
         operators.push(aux);
@@ -349,33 +338,22 @@ void Store::order2Operator()
 
 void Store::orderFinish(ostream& out)
 {
-    vector<OrderOperator*> vec;
-    for(; !operators.empty(); operators.pop())
-        vec.push_back(new OrderOperator(*(operators.top())));
+    vector<shared_ptr<OrderOperator>> vec = queue2Vec();
+    vector<int> number(vec.size());
+    int i = 0;
     
-    out<<"Numarul de comenzi al fiecarui operator: ";
-    vector<Order*> finish;
     for(auto elem : vec)
     {
-        vector<Order*> aux = elem->orderFinish();
-        if(!aux.empty())
-            finish.insert(finish.end(), aux.begin(), aux.end());
-        operators.push(elem);
-
-        out<<elem->ordersNumber()<<' ';
+        elem->orderFinish();
+        number[i++] = elem->ordersNumber();
     }
+    out<<"Numarul de comenzi al fiecarui operator: ";
+    for(int j = 0; j < i; j++)
+        out<<number[j]<<' ';
     out<<'\n';
-
-    if(!finish.empty())
-    {
-        cout<<"Comenzi finalizate:\n";
-        for(auto i : finish)
-        {
-            cout<<1<<'\n';
-            delete i;
-        }
-        finish.clear();
-    }
+    
+    vec.clear();
+    number.clear();
 }
 
 void Store::ordersDel() {
@@ -397,14 +375,10 @@ void Store::writeMostOrders()
         cout<<"eroare_fisier !! nu se poate deschide fisierul !!";
     else
     {
-        vector<OrderOperator*> vec;
-        for(; !operators.empty(); operators.pop())
-            vec.push_back(new OrderOperator(*(operators.top())));
-        for(auto i : vec)
-            operators.push(i);
+        vector<shared_ptr<OrderOperator>> vec = queue2Vec();
     
-        vector<OrderOperator*>::iterator ma = max_element(vec.begin(), vec.end(), 
-                [](OrderOperator* elem1, OrderOperator* elem2) { return (elem1->allOrders() < elem2->allOrders());});
+        vector<shared_ptr<OrderOperator>>::iterator ma = max_element(vec.begin(), vec.end(), 
+                [](const shared_ptr<OrderOperator>& elem1, const shared_ptr<OrderOperator>& elem2) { return (elem1->allOrders() < elem2->allOrders());});
         if((*ma)->allOrders() == 0)
             cout<<"raport_invalid: !! nu s-a realizat nici o procesare de comenzi !!\n\n";
         else
@@ -431,17 +405,13 @@ void Store::writeMostExpensive()
         cout<<"eroare_fisier !! nu se poate deschide fisierul !!";
     else
     {
-        vector<OrderOperator*> vec;
-        for(; !operators.empty(); operators.pop())
-            vec.push_back(new OrderOperator(*(operators.top())));
-        for(auto i : vec)
-            operators.push(i);
+        vector<shared_ptr<OrderOperator>> vec = queue2Vec();
 
-        if(!count_if(vec.begin(), vec.end(), [](const OrderOperator* i) { return !(i->allOrders());}))
+        if(!Store::orders_processed)
             cout<<"raport_invalid: !! nu s-a realizat nici o procesare de comenzi !!\n\n";
         else
         {
-            sort(vec.begin(), vec.end(), [](const OrderOperator* elem1, const OrderOperator* elem2) { return (elem1->bonus4Orders() > elem2->bonus4Orders());});
+            sort(vec.begin(), vec.end(), [](const shared_ptr<OrderOperator>& elem1, const shared_ptr<OrderOperator>& elem2) { return (elem1->bonus4Orders() > elem2->bonus4Orders());});
             out<<vec[0]<<'\n'<<vec[1]<<'\n'<<vec[2];
         }
         
@@ -463,15 +433,15 @@ void Store::writeBigSalary()
         cout<<"eroare_fisier !! nu se poate deschide fisierul !!";
     else
     {
-        vector<Employee*> vec;
-        for(; !operators.empty(); operators.pop())
-            vec.push_back(new OrderOperator(*(operators.top())));
-        for(auto i : vec)
-            operators.push(dynamic_cast<OrderOperator*>(i));
+        vector<shared_ptr<OrderOperator>> aux = queue2Vec();
+        vector<shared_ptr<Employee>> vec;
+        for(auto& i : aux)
+            vec.push_back(move(i));
+        aux.clear();
 
         vec.insert(vec.end(), employees.begin(), employees.end());
-        sort(vec.begin(), vec.end(), [](const Employee* elem1, const Employee* elem2) { return (elem1->salary() > elem2->salary());});
-        sort(vec.begin(), vec.begin() + 3, [](const Employee* elem1, const Employee* elem2) { return compareByName(elem1, elem2);});
+        sort(vec.begin(), vec.end(), [](const shared_ptr<Employee> elem1, const shared_ptr<Employee> elem2) { return (elem1->salary() > elem2->salary());});
+        sort(vec.begin(), vec.begin() + 3, [](const shared_ptr<Employee> elem1, const shared_ptr<Employee> elem2) { return compareByName(elem1, elem2);});
 
         out<<vec[0]<<'\n'<<vec[1]<<'\n'<<vec[2];
         
