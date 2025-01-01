@@ -34,10 +34,6 @@ public:
     //////////////////////////
     void employeeAdd(unique_ptr<Employee>&);
     void employeeAdd(unique_ptr<OrderOperator>&);
-    void employeeAdd(Employee&);
-    void employeeAdd(Employee&&);
-    void employeeAdd(OrderOperator&);
-    void employeeAdd(OrderOperator&&);
     vector<shared_ptr<Employee>>::const_iterator employeeExist(const string&) const; // cautarea se face doar dupa ID
     void employeeDel(const string&);
     void employeeSet(const string&, const string&);
@@ -49,12 +45,6 @@ public:
      /* OPERATII CU PRODUSE */
     /////////////////////////
     void productAdd(unique_ptr<Product>&);
-
-    template<class T>
-    void productAdd(T&);
-    template<class T>
-    void productAdd(T&&);
-
     vector<unique_ptr<Product>>::const_iterator productExist(const string&) const; // cautarea se face doar dupa ID
     void productDel(const string&);
     void productSet(const string&, const int);

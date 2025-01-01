@@ -218,6 +218,14 @@ istream& operator>>(istream& in, unique_ptr<Employee>& elem)
     return in;
 }
 
+bool operator==(const shared_ptr<Employee>& elem1, const shared_ptr<Employee>& elem2) {
+    return (elem1->CNP == elem2->CNP);
+}
+
+bool operator!=(const shared_ptr<Employee>& elem1, const shared_ptr<Employee>& elem2) {
+    return !(elem1 == elem2);
+}
+
 const string Employee::position() const {
     return (coefficient == 0.75 ? "asistent" : (coefficient == 1 ? "operator comenzi" : "manager"));
 }

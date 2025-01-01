@@ -60,11 +60,12 @@ const string name()
 void readEmployee(Store& m, istream& in)
 {
     unsigned int nr = (&in == &cin ? number() : number(dynamic_cast<ifstream&>(in)));
+    bool ok = false;
 
     for(register int i = 0; i < nr; i++)
     {
         if(&in == &cin)
-            cout<<"Introduceti pozitia angajatului, pe care doriti sa-l adaugati (manager/ asistent/ operator de comenzi): ";
+            cout<<"Introduceti pozitia angajatului, pe care doriti sa-l adaugati (manager/asistent/operator de comenzi): ";
         string option;
         getline(in, option);
 
@@ -84,7 +85,7 @@ void readEmployee(Store& m, istream& in)
                     return;
             }
 
-        try{ in>>elem;}
+        try { in>>elem;}
         catch(const exception& e) { 
             elem.reset(); 
             if(&in == &cin) { 
@@ -96,10 +97,24 @@ void readEmployee(Store& m, istream& in)
                 return;
             }
         }
-        m.employeeAdd(elem);
+
+        try { 
+            m.employeeAdd(elem); 
+            ok = true;
+            if(&in == &cin)
+                cout<<"Adaugarea a fost efectuata cu succes!\n\n";
+        } catch(const exception& e) { 
+            if(&in == &cin) { 
+                cout<<e.what();
+                i--; continue;
+            }
+            else 
+                cout<<"Angajatul "<<(i + 1)<<": "<<e.what();
+        }
     }
 
-    cout<<"Adaugarea a fost efectuata cu succes!\n\n";
+    if(ok && &in != &cin)
+        cout<<"Adaugarea a fost efectuata cu succes!\n\n";
 }
 
 void addEmployee(Store& m)
@@ -128,7 +143,7 @@ void addEmployee(Store& m)
             }
         }
         else
-            cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele doua: tastatura/fisier !!\n\n";
+            cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele doua: (tastatura/fisier) !!\n\n";
 }
 
 void writeEmployee(Store& m, bool all)
@@ -163,17 +178,18 @@ void writeEmployee(Store& m, bool all)
             }
         }
         else
-            cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele doua: consola/fisier !!\n\n";
+            cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele doua: (consola/fisier) !!\n\n";
 }
 
 void readProduct(Store& m, istream& in)
 {
     unsigned int nr = (&in == &cin ? number() : number(dynamic_cast<ifstream&>(in)));
+    bool ok = false;
 
     for(register int i = 0; i < nr; i++)
     {   
         if(&in == &cin)
-            cout<<"Introduceti tipul produsului, pe care doriti sa-l adaugati (articol vestimentar/ disc/ disc vintage): ";
+            cout<<"Introduceti tipul produsului, pe care doriti sa-l adaugati (articol vestimentar/disc/disc vintage): ";
         string option;
         getline(in, option);
 
@@ -196,23 +212,36 @@ void readProduct(Store& m, istream& in)
                         return;
                 }
 
-        try{ in>>elem;}
+        try { in>>elem;}
         catch(const exception& e) { 
             elem.reset(); 
             if(&in == &cin) { 
                 cout<<e.what();
                 i--; continue;
             }
+            else
+                cout<<"Produsul "<<(i + 1)<<" (toate produsele, care urmeaza dupa acesta nu vor putea fi adaugate): "<<e.what();
+        }
+
+        try { 
+            m.productAdd(elem);
+            ok = true;
+            if(&in == &cin) 
+                cout<<"Adaugarea a fost efectuata cu succes!\n\n";
+        } catch(const exception& e) {
+            if(&in == &cin) { 
+                cout<<e.what();
+                i--; continue;
+            }
             else {
-                cout<<"Produsul "<<i<<" (toate produsele, care urmeaza dupa acesta nu vor putea fi adaugate): "<<e.what(); 
+                cout<<"Produsul "<<(i + 1)<<": "<<e.what(); 
                 return;
             }
         }
-
-        m.productAdd(elem);
     }
 
-    cout<<"Adaugarea a fost efectuata cu succes!\n\n";
+    if(ok && &in != &cin)
+        cout<<"Adaugarea a fost efectuata cu succes!\n\n";
 }
 
 void addProduct(Store& m)
@@ -243,7 +272,7 @@ void addProduct(Store& m)
             }
         }
         else
-            cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele doua: tastatura/fisier !!\n\n";
+            cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele doua: (tastatura/fisier) !!\n\n";
 }
 
 void writeProducts(Store& m, bool all)
@@ -339,7 +368,7 @@ void managementOrders(Store& m)
             }
         }
         else
-            cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele doua: tastatura/fisier !!\n\n";
+            cout<<"optiune_invalida: !! optiunea trebuie sa fie una dintre cele doua: (tastatura/fisier) !!\n\n";
 
     bool exist = true;
     for(register int i = 0; m.orderExist(); i++)
@@ -354,6 +383,6 @@ void managementOrders(Store& m)
         
         m.orderFinish();
         if(m.orderNumber())
-            cout<<":\nMai sunt "<<m.orderNumber()<<" comenzi de procesat, acestea se afla in lista de asteptare.\n\n";
+            cout<<"Mai sunt "<<m.orderNumber()<<" comenzi de procesat, acestea se afla in lista de asteptare.\n\n";
     }
 }

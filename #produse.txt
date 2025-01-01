@@ -1,7 +1,7 @@
 6
 articol vestimentar
 Tricou Polo
-50
+100
 75.5
 alb
 Ralph Lauren
@@ -13,7 +13,7 @@ albastru
 Levi's
 disc
 Dark Side of the Moon
-20
+100
 150.0
 Harvest
 Pink Floyd
@@ -22,7 +22,7 @@ The Dark Side of the Moon
 1
 disc vintage
 Sgt. Pepper's Lonely Hearts Club Band
-10
+100
 500.0
 Parlophone
 The Beatles

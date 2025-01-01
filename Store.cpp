@@ -70,34 +70,30 @@ vector<shared_ptr<OrderOperator>> Store::queue2Vec()
     return vec;
 }
 
-void Store::employeeAdd(unique_ptr<Employee>& elem) {
+void Store::employeeAdd(unique_ptr<OrderOperator>& elem)
+{
+    shared_ptr<OrderOperator> ptr = move(elem);
+    auto&& vec = queue2Vec();
+    if(vec.end() != find_if(vec.begin(), vec.end(), [&ptr](const shared_ptr<OrderOperator>& x) { return (ptr == x);}))
+        throw DynamicException("angajat_duplicat", "!! nu poti adauga de 2ori acelasi angajat (CNP identic) !!\n\n");
+    
+    operators.push(ptr);
+}
+
+void Store::employeeAdd(unique_ptr<Employee>& elem)
+{
     if(elem->position() == "operator comenzi")
     {
-        shared_ptr<Employee> aux = move(elem);
-        operators.push(dynamic_pointer_cast<OrderOperator>(move(aux)));
+        unique_ptr<OrderOperator> aux(dynamic_cast<OrderOperator*>(elem.release()));
+        employeeAdd(aux);
     }
     else
-        employees.push_back(move(elem));
-}
-
-void Store::employeeAdd(unique_ptr<OrderOperator>& elem) {
-    operators.push(move(elem));
-}
-
-void Store::employeeAdd(Employee& elem) {
-    employees.push_back(make_unique<Employee>(elem));
-}
-
-void Store::employeeAdd(Employee&& elem) {
-    employees.push_back(make_unique<Employee>(move(elem)));
-}
-
-void Store::employeeAdd(OrderOperator& elem) {
-    operators.push(make_shared<OrderOperator>(elem));
-}
-
-void Store::employeeAdd(OrderOperator&& elem) {
-    operators.push(make_shared<OrderOperator>(move(elem)));
+    {
+        shared_ptr<Employee> ptr = move(elem);
+        if(employees.end() != find_if(employees.begin(), employees.end(), [&ptr](const shared_ptr<Employee>& x) { return (ptr == x);}))
+            throw DynamicException("angajat_duplicat", "!! nu poti adauga de 2ori acelasi angajat (CNP identic) !!\n\n");
+        employees.push_back(move(ptr));
+    }
 }
 
 vector<shared_ptr<Employee>>::const_iterator Store::employeeExist(const string& ID) const {
@@ -150,15 +146,28 @@ void Store::employeeSet(const string& ID, string&& name)
         if(operators.empty())
             throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
 
-        vector<shared_ptr<OrderOperator>> vec = queue2Vec();
-        auto&& elem1 = find_if(vec.begin(), vec.end(), [&ID](const shared_ptr<OrderOperator>& x) { return x->exist(ID);});
-        if(elem1 == vec.end())
+        vector<shared_ptr<OrderOperator>> aux;
+        bool ok = false;
+        for(; !operators.empty(); operators.pop())
         {
-            vec.clear();
-            throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
+            auto i = operators.top();
+
+            if(i->exist(ID))
+            {
+                ok = true;
+                i->setName(move(name));
+                break;
+            }
+
+            aux.push_back(i);
         }
-        (*elem1)->setName(move(name));
-        vec.clear();
+
+        for(auto& i : aux)
+            operators.push(i);
+        aux.clear();
+
+        if(!ok)
+            throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
     }
 }
 
@@ -176,15 +185,28 @@ void Store::employeeInf(const string& ID, ostream& out)
         if(operators.empty())
             throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
 
-        vector<shared_ptr<OrderOperator>> vec = queue2Vec();
-        auto&& elem1 = find_if(vec.begin(), vec.end(), [&ID](const shared_ptr<OrderOperator>& x) { return x->exist(ID);});
-        if(elem1 == vec.end())
+        vector<shared_ptr<OrderOperator>> aux;
+        bool ok = false;
+        for(; !operators.empty(); operators.pop())
         {
-            vec.clear();
-            throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
+            auto i = operators.top();
+
+            if(i->exist(ID))
+            {
+                ok = true;
+                cout<<i;
+                break;
+            }
+
+            aux.push_back(i);
         }
-        cout<<*elem1;
-        vec.clear();
+
+        for(auto& i : aux)
+            operators.push(i);
+        aux.clear();
+
+        if(!ok)
+            throw DynamicException("angajat_inexistent", "!! angajatul cu ID ul " + ID + " nu exista !!\n\n");
     }
 }
 
@@ -214,38 +236,11 @@ void Store::employeesWrite(ostream& out)
 
 /* IMPLEMENTARE METODE PENTRU GESTIUNEA PRODUSELOR */
 void Store::productAdd(unique_ptr<Product>& elem) {
+    auto&& aux = find_if(products.begin(), products.end(), [&elem](const unique_ptr<Product>& x) { return compare(elem, x);});
+    if(aux != products.end())
+        throw DynamicException("produs_existent", "!! nu se poate adauga de 2ori acelasi produs, modificati stocul, daca doriti sa adaugati produse de acest tip !!\n\n");
+    
     products.push_back(move(elem));
-}
-
-template<class T>
-void Store::productAdd(T&& elem)
-{
-    auto aux = typeid(elem);
-    if(aux == typeid(Clothes) || aux == typeid(Disk) || aux == typeid(VintageDisk))
-    {
-        unique_ptr<Product> aux1;
-        if(aux == typeid(Clothes))
-            aux1 = make_unique<Clothes>(move(elem));
-        else
-            if(aux == typeid(Disk))
-                aux1 = make_unique<Disk>(move(elem));
-            else
-                aux1 = make_unique<VintageDisk>(move(elem));
-        
-        products.push_back(move(aux1));
-    }
-    else
-        throw DynamicException("produs_inexistent", "!! produsul nu exista in stocul magazinului !!\n\n");
-}
-
-template<class T>
-void Store::productAdd(T& elem)
-{
-    auto aux = typeid(elem);
-    if(aux == typeid(Clothes) || aux == typeid(Disk) || aux == typeid(VintageDisk))
-        productAdd(T(elem));
-    else
-        throw DynamicException("produs_inexistent", "!! produsul nu exista in stocul magazinului !!\n\n");
 }
 
 vector<unique_ptr<Product>>::const_iterator Store::productExist(const string& ID) const {
@@ -321,11 +316,14 @@ void Store::order2Operator()
     for(; !orders.empty() && (operators.top())->ordersNumber() < 3; orders.pop())
     {
         unique_ptr<Order> order = move(const_cast<unique_ptr<Order>&>(orders.top()));
-        cout<<"Comanda a fost asignata unui operator de comenzi\n"<<order;
 
         bool ok = order->verifStock(products);
         if(!ok)
+        {
+            cout<<"Comanda nu poate fi procesata, nu exista suficiente produse in stoc\n"<<order;
             continue;
+        }
+        cout<<"Comanda a fost asignata unui operator de comenzi\n"<<order;
 
         shared_ptr<OrderOperator> aux = operators.top();
         aux->orderAdd(order);
@@ -372,7 +370,7 @@ void Store::writeMostOrders()
 
     ofstream out("employee_the_most_orders_processed.csv");
     if(!out.is_open())
-        cout<<"eroare_fisier !! nu se poate deschide fisierul !!";
+        cout<<"eroare_fisier !! nu se poate deschide fisierul !!\n\n";
     else
     {
         vector<shared_ptr<OrderOperator>> vec = queue2Vec();
@@ -384,7 +382,7 @@ void Store::writeMostOrders()
         else
         {
             out<<*ma;
-            cout<<"Raportul a fost creat cu succes!";
+            cout<<"Raportul a fost creat cu succes!\n\n";
         }
         
         vec.clear();
@@ -402,7 +400,7 @@ void Store::writeMostExpensive()
     
     ofstream out("employee_the_most_expensive_orders.csv");
     if(!out.is_open())
-        cout<<"eroare_fisier !! nu se poate deschide fisierul !!";
+        cout<<"eroare_fisier !! nu se poate deschide fisierul !!\n\n";
     else
     {
         vector<shared_ptr<OrderOperator>> vec = queue2Vec();
@@ -413,6 +411,7 @@ void Store::writeMostExpensive()
         {
             sort(vec.begin(), vec.end(), [](const shared_ptr<OrderOperator>& elem1, const shared_ptr<OrderOperator>& elem2) { return (elem1->bonus4Orders() > elem2->bonus4Orders());});
             out<<vec[0]<<'\n'<<vec[1]<<'\n'<<vec[2];
+            cout<<"Raportul a fost creat cu succes!\n\n";
         }
         
         vec.clear();
@@ -430,7 +429,7 @@ void Store::writeBigSalary()
 
     ofstream out("employees_the_highest_salary.csv");
     if(!out.is_open())
-        cout<<"eroare_fisier !! nu se poate deschide fisierul !!";
+        cout<<"eroare_fisier !! nu se poate deschide fisierul !!\n\n";
     else
     {
         vector<shared_ptr<OrderOperator>> aux = queue2Vec();
@@ -447,6 +446,6 @@ void Store::writeBigSalary()
         
         vec.clear();
         out.close();
-        cout<<"Raportul a fost creat cu succes!";
+        cout<<"Raportul a fost creat cu succes!\n\n";
     }
 }

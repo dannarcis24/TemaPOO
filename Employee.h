@@ -29,6 +29,8 @@ public:
     friend istream& operator>>(istream&, Employee&);
     friend istream& operator>>(istream&, unique_ptr<Employee>&);
     friend bool compareByName(const shared_ptr<Employee>&, const shared_ptr<Employee>&);
+    friend bool operator==(const shared_ptr<Employee>&, const shared_ptr<Employee>&);
+    friend bool operator!=(const shared_ptr<Employee>&, const shared_ptr<Employee>&);
 
     virtual const int salary() const;
     void setName(const string&);
