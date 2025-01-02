@@ -21,6 +21,8 @@ public:
     friend ostream& operator<<(ostream&, const OrderOperator&);
     friend istream& operator>>(istream&, OrderOperator&);
     friend istream& operator>>(istream&, shared_ptr<OrderOperator>&);
+    friend bool operator==(const shared_ptr<OrderOperator>&, const shared_ptr<OrderOperator>&);
+    friend bool operator!=(const shared_ptr<OrderOperator>&, const shared_ptr<OrderOperator>&);
 
     const int salary() const;
     

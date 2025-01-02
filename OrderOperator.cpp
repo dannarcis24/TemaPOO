@@ -140,6 +140,14 @@ istream& operator>>(istream& in, shared_ptr<OrderOperator>& elem)
     return in;
 }
 
+bool operator==(const shared_ptr<OrderOperator>& elem1, const shared_ptr<OrderOperator>& elem2) {
+    return (elem1->CNP == elem2->CNP);
+}
+
+bool operator!=(const shared_ptr<OrderOperator>& elem1, const shared_ptr<OrderOperator>& elem2) {
+    return !(elem1 == elem2);
+}
+
 const int OrderOperator::ordersNumber() const {
     return orders.size();
 }

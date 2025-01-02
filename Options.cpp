@@ -104,12 +104,9 @@ void readEmployee(Store& m, istream& in)
             if(&in == &cin)
                 cout<<"Adaugarea a fost efectuata cu succes!\n\n";
         } catch(const exception& e) { 
-            if(&in == &cin) { 
-                cout<<e.what();
-                i--; continue;
-            }
-            else 
-                cout<<"Angajatul "<<(i + 1)<<": "<<e.what();
+            if(&in == &cin) 
+                i--;
+            cout<<"Angajatul "<<(i + 1)<<": "<<e.what();
         }
     }
 
@@ -229,14 +226,9 @@ void readProduct(Store& m, istream& in)
             if(&in == &cin) 
                 cout<<"Adaugarea a fost efectuata cu succes!\n\n";
         } catch(const exception& e) {
-            if(&in == &cin) { 
-                cout<<e.what();
-                i--; continue;
-            }
-            else {
-                cout<<"Produsul "<<(i + 1)<<": "<<e.what(); 
-                return;
-            }
+            if(&in == &cin) 
+                i--;
+            cout<<"Produsul "<<(i + 1)<<": "<<e.what(); 
         }
     }
 

@@ -1,4 +1,4 @@
-6
+7
 manager
 Dan
 Narcis-Costinel
@@ -29,3 +29,8 @@ Catalina
 Catalina-Elena
 6050831300864
 24.04.2021
+operator comenzi
+Ioan
+Maria
+6000607042259
+31.01.2021
