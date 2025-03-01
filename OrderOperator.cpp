@@ -76,7 +76,7 @@ void OrderOperator::orderFinish()
         if((*i)->getTime() == 0)
         {
             total_orders++;
-            finish--;
+            work--;
             bonus += 0.005 * (*i)->getPrice();
 
             i = orders.erase(i);
@@ -84,7 +84,7 @@ void OrderOperator::orderFinish()
         else
         {
             i++;
-            work--;
+            finish--;
         }
     
     cout<<"Operatorul de comenzi cu ID ul "<<ID<<" a finalizat "<<finish<<" comenzi si mare are de terminat "<<work<<" comenzi de impachetat si livrat.\n";
